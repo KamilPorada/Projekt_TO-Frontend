@@ -2,7 +2,7 @@ const tailwindColors = require('tailwindcss/colors')
 
 const colors = {
 	...tailwindColors,
-	mainColor: '#fcba03',
+	mainColor: '#e1b848',
 	secondaryColor: '#262626',
 	backgroundColor: '#d8d8d8',
 }
