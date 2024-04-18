@@ -22,7 +22,6 @@ const DatabaseConnectionForm: React.FC = () => {
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 
-		// Sprawdzanie, czy pola są puste
 		const errors = {
 			login: !login,
 			password: !password,

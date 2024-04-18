@@ -1,5 +1,4 @@
 import DatabaseConnectionForm from '@/components/forms/DatabaseConnectionForm'
-import HeroDatabase from '../public/img/hero-database.png'
 
 const Home = () => {
 	return (
