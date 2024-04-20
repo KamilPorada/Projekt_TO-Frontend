@@ -61,17 +61,14 @@ const AddColumnForm: React.FC<Props> = ({ onAddColumn }) => {
     const handleAddColumn = () => {
         const validationErrors: any = {}
 
-        // Column name validation
         if (!newColumn.fieldName.trim()) {
             validationErrors.fieldName = 'Column name is required'
         }
 
-        // Data type validation
         if (!newColumn.fieldType) {
             validationErrors.fieldType = 'Data type is required'
         }
 
-        // Additional inputs validation depending on the selected data type
         if (newColumn.fieldType === 'decimal') {
             if (newColumn.fieldSize1 <= 0 || newColumn.fieldSize2 < 0) {
                 validationErrors.fieldSize = 'Provide valid values for the number of integer and decimal places'
@@ -89,12 +86,10 @@ const AddColumnForm: React.FC<Props> = ({ onAddColumn }) => {
         }
 
         if (Object.keys(validationErrors).length === 0) {
-            // No errors, add the column
             onAddColumn(newColumn)
             setNewColumn(initialColumnState)
             setErrors({})
         } else {
-            // Errors occurred, set errors and highlight invalid fields
             setErrors(validationErrors)
         }
     }
