@@ -49,7 +49,7 @@ const ColumnFieldItem: React.FC<Props> = ({ column }) => {
 					/>
 					<p className='text-black text-sm w-24'>{column.fieldName}</p>
 				</div>
-				<p className='w-36 mr-2 text-sm'>{fieldType}</p>
+				<p className='w-36 mr-2 text-sm uppercase'>{fieldType}</p>
 				<p className='w-96 text-sm'>{additionalParametersString}</p>
 			</div>
 		</div>

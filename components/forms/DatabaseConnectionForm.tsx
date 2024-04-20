@@ -1,40 +1,51 @@
-'use client'
-import React, { useState } from 'react'
-import Button from '../UI/Button'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDatabase } from '@fortawesome/free-solid-svg-icons'
+import React, { useState } from 'react';
+import Button from '../UI/Button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faDatabase } from '@fortawesome/free-solid-svg-icons';
 
 const DatabaseConnectionForm: React.FC = () => {
-	const [connectionString, setConnectionString] = useState<string>('')
-	const [login, setLogin] = useState<string>('')
-	const [password, setPassword] = useState<string>('')
-	const [databaseName, setDatabaseName] = useState<string>('')
-	const [ipAddress, setIpAddress] = useState<string>('')
-	const [port, setPort] = useState<string>('')
-	const [errors, setErrors] = useState<{ [key: string]: boolean }>({
-		login: false,
-		password: false,
-		databaseName: false,
-		ipAddress: false,
-		port: false,
-	})
+    const [login, setLogin] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [databaseName, setDatabaseName] = useState<string>('');
+    const [ipAddress, setIpAddress] = useState<string>('');
+    const [port, setPort] = useState<string>('');
+    const [errors, setErrors] = useState<{ [key: string]: boolean }>({
+        login: false,
+        password: false,
+        databaseName: false,
+        ipAddress: false,
+        port: false,
+    });
 
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault()
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
 
-		const errors = {
-			login: !login,
-			password: !password,
-			databaseName: !databaseName,
-			ipAddress: !ipAddress,
-			port: !port,
-		}
-		setErrors(errors)
+        const data = {
+            login,
+            password,
+            databaseName,
+            ipAddress,
+            port,
+        };
 
-		if (!Object.values(errors).some(error => error)) {
-			setConnectionString(`mysql://${login}:${password}@${ipAddress}:${port}/${databaseName}`)
-		}
-	}
+        try {
+            const response = await fetch('URL', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                console.log('Connection successful');
+            } else {
+                console.error('Failed to connect');
+            }
+        } catch (error) {
+            console.error('Error connecting to backend:', error);
+        }
+    };
 
 	return (
 		<form
