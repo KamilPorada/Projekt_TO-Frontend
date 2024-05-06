@@ -1,7 +1,8 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faKey, faCircle } from '@fortawesome/free-solid-svg-icons'
+import { faKey, faCircle, faTrash } from '@fortawesome/free-solid-svg-icons'
 
 interface Props {
+	width: number
 	column: {
 		fieldName: string
 		fieldType: string
@@ -15,9 +16,11 @@ interface Props {
 		isUnique: boolean
 		isNotNull: boolean
 	}
+	removable: boolean
+	onDelete: () => void
 }
 
-const ColumnFieldItem: React.FC<Props> = ({ column }) => {
+const ColumnFieldItem: React.FC<Props> = ({ column, width, onDelete, removable }) => {
 	const fieldType =
 		column.fieldType === 'decimal'
 			? 'decimal(' + column.fieldSize1 + ',' + column.fieldSize2 + ')'
@@ -33,10 +36,16 @@ const ColumnFieldItem: React.FC<Props> = ({ column }) => {
 		(column.isUnique ? ' UNIQUE,' : '') +
 		(column.isNotNull ? ' NOT NULL' : '')
 
+	const handleDeleteClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+		e.stopPropagation()
+		onDelete()
+	}
+
 	return (
-		<div className='flex flex-row justify-between items-center w-[640px] border-b overflow-x-auto font-thin'>
+		<div
+			className={`flex flex-row justify-between items-center w-[${width}px] border-b overflow-x-auto font-thin mt-1`}>
 			<div className='flex flex-row justify-between items-center w-full h-full'>
-				<div className='flex flex-row justify-center items-center gap-2 w-28 mr-2'>
+				<div className='flex flex-row justify-center items-center gap-2 w-24'>
 					<FontAwesomeIcon
 						icon={column.isPrimaryKey || column.isForeignKey ? faKey : faCircle}
 						className={`${
@@ -44,13 +53,16 @@ const ColumnFieldItem: React.FC<Props> = ({ column }) => {
 								? 'text-blue-400'
 								: column.isPrimaryKey
 								? 'text-mainColor'
-								: 'text-red-600'
+								: 'text-purple-500'
 						} ${!column.isPrimaryKey && !column.isForeignKey ? 'text-[8px]' : ''} w-4`}
 					/>
 					<p className='text-black text-sm w-24'>{column.fieldName}</p>
 				</div>
-				<p className='w-36 mr-2 text-sm uppercase'>{fieldType}</p>
+				<p className='w-32 mr-2 text-sm uppercase'>{fieldType}</p>
 				<p className='w-96 text-sm'>{additionalParametersString}</p>
+				<div onClick={handleDeleteClick} className={`${removable ? 'block' : 'hidden'}`}>
+					<FontAwesomeIcon icon={faTrash} className='text-red-700 w-4 cursor-pointer' />
+				</div>
 			</div>
 		</div>
 	)

@@ -1,9 +1,9 @@
-import NewTableForm from '@/components/forms/NewTableForm'
+import TableNavigation from '@/components/Navigation/TableNavigation'
 
 const Table = () => {
 	return (
-		<div className='container flex justify-center items-center w-screen h-screen'>
-			<NewTableForm />
+		<div className='container flex justify-center items-center'>
+			<TableNavigation/>
 		</div>
 	)
 }

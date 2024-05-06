@@ -1,4 +1,4 @@
-import DatabaseConnectionForm from '@/components/forms/DatabaseConnectionForm'
+import DatabaseConnectionForm from '@/components/Forms/DatabaseConnectionForm'
 
 const Home = () => {
 	return (

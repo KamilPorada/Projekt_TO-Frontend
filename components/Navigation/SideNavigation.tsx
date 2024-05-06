@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBars, faXmark, faDatabase, faTable, faFileCircleQuestion } from '@fortawesome/free-solid-svg-icons'
-import Brand from './UI/Brand'
+import Brand from '../UI/Brand'
 
 function SideBar() {
 	const [isMenuVisible, setIsMenuVisible] = useState(true)
@@ -38,21 +38,21 @@ function SideBar() {
 					<Brand />
 					<Link href={'/'}>
 						<div className='flex flex-row justify-between items-center mt-2 text-white font-thin cursor-pointer transition hover:text-mainColor hover:font-normal'>
-							<p className='text-sm md:text-base'>Baza danych</p>
+							<p className='text-sm md:text-base'>Database</p>
 							<FontAwesomeIcon icon={faDatabase} />
 						</div>
 					</Link>
 					<div className='h-px w-full bg-zinc-600'></div>
 					<Link href={'/table'}>
 						<div className='flex flex-row justify-between items-center mt-2 text-white font-thin cursor-pointer transition hover:text-mainColor hover:font-normal'>
-							<p className='text-sm md:text-base'>Tabela</p>
+							<p className='text-sm md:text-base'>Table</p>
 							<FontAwesomeIcon icon={faTable} />
 						</div>
 					</Link>
 					<div className='h-px w-full bg-zinc-600'></div>
 					<Link href={'/operation'}>
 						<div className='flex flex-row justify-between items-center mt-2 text-white font-thin cursor-pointer transition hover:text-mainColor hover:font-normal'>
-							<p className='text-sm md:text-base'>Operacja</p>
+							<p className='text-sm md:text-base'>Operation</p>
 							<FontAwesomeIcon icon={faFileCircleQuestion} />
 						</div>
 					</Link>
@@ -60,7 +60,7 @@ function SideBar() {
 				</div>
 				<footer className='absolute bottom-0 w-full -mx-2 mb-2 flex flex-col text-center text-white text-xs sm:text-sm font-light'>
 					<p>&copy; {currentYear} MySQL Designer</p>
-					<p>Wszelkie prawa zastrzeżone</p>
+					<p>All rights reserved</p>
 				</footer>
 			</nav>
 		</>

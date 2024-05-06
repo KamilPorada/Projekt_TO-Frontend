@@ -3,10 +3,27 @@ import React, { useState } from 'react'
 import Button from '../UI/Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTable, faPlus } from '@fortawesome/free-solid-svg-icons'
-import AddColumnForm from '../Forms/AddColumnForm'
+import AddColumnForm from './AddColumnForm'
 import ColumnFieldItem from '../Items/ColumnFieldItem'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+
+interface Table {
+	name: string
+	columns: {
+		fieldName: string
+		fieldType: string
+		fieldSize1: number
+		fieldSize2: number
+		isPrimaryKey: boolean
+		isForeignKey: boolean
+		foreignTable: string
+		foreignField: string
+		isAutoincrement: boolean
+		isUnique: boolean
+		isNotNull: boolean
+	}[]
+}
 
 interface TableColumn {
 	fieldName: string
@@ -22,20 +39,20 @@ interface TableColumn {
 	isNotNull: boolean
 }
 
-interface Props {
-    onTableCreated: () => void;
+interface EditTableFormProps {
+	editedTable: Table | null
+	onTableEdited: () => void
 }
 
-const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
-	const [tableName, setTableName] = useState<string>('')
-	const [columns, setColumns] = useState<TableColumn[]>([])
+const EditTableForm: React.FC<EditTableFormProps> = ({ editedTable, onTableEdited }) => {
+	const [tableName, setTableName] = useState<string>(editedTable ? editedTable.name : '')
+	const [columns, setColumns] = useState<TableColumn[]>(editedTable?.columns || [])
 	const [showAddColumnForm, setShowAddColumnForm] = useState<boolean>(false)
 	const [isTableNameEntered, setIsTableNameEntered] = useState<boolean>(false)
 	const [tableNameError, setTableNameError] = useState<string>('')
 	const [columnsError, setColumnsError] = useState<string>('')
 
 	const handleSubmit = async () => {
-
 		if (!isTableNameEntered) {
 			setTableNameError('Table name is required')
 			return
@@ -46,33 +63,34 @@ const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
 			return
 		}
 
-		const dataToSend = {
+		const dataToUpdate = {
 			tableName: tableName,
 			columns: columns,
 		}
 
+		console.log(dataToUpdate)
 
 		// try {
-		//     const response = await fetch('URL', {
-		//         method: 'POST',
-		//         headers: {
-		//             'Content-Type': 'application/json'
-		//         },
-		//         body: JSON.stringify(dataToSend)
-		//     });
+		// 	const response = await fetch('URL', {
+		// 		method: 'PATCH', // zmiana na metodę PATCH
+		// 		headers: {
+		// 			'Content-Type': 'application/json'
+		// 		},
+		// 		body: JSON.stringify(dataToUpdate)
+		// 	});
 
-		//     if (response.ok) {
-		//         console.log('Data sent successfully');
-		//     } else {
-		//         console.error('Failed to send data');
-		//     }
+		// 	if (response.ok) {
+		// 		console.log('Data updated successfully');
+		// 	} else {
+		// 		console.error('Failed to update data');
+		// 	}
 		// } catch (error) {
-		//     console.error('Error sending data:', error);
+		// 	console.error('Error updating data:', error);
 		// }
-		toast.success('Pomyślnie dodano nową tabelę!', {
+		toast.success('Pomyślnie edytowano dane tabeli!', {
 			position: 'top-center',
 		})
-		onTableCreated();
+		onTableEdited()
 	}
 
 	const handleAddColumn = (newColumn: TableColumn) => {
@@ -88,8 +106,8 @@ const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
 	}
 
 	const handleDeleteColumn = (index: number) => {
-		setColumns(prevColumns => prevColumns.filter((_, i) => i !== index));
-	};
+		setColumns(prevColumns => prevColumns.filter((_, i) => i !== index))
+	}
 
 	const handleTableNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value
@@ -101,13 +119,13 @@ const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
 	return (
 		<div
 			onSubmit={handleSubmit}
-			className='flex flex-col justify-center items-center w-full sm:w-4/5 md:w-3/5 bg-white rounded-md shadow-lg p-7 overflow-x-auto'>
+			className='flex flex-col justify-center items-center w-full sm:w-4/5 md:w-3/5 bg-white rounded-md shadow-lg p-5 overflow-x-auto'>
 			<div className='flex flex-col justify-center items-center text-center'>
 				<div className='flex flex-row justify-center items-center gap-4 text-mainColor mb-2'>
-					<h2 className='text-xl md:text-2xl uppercase font-semibold'>New Table</h2>
+					<h2 className='text-xl md:text-2xl uppercase font-semibold'>Edit Table</h2>
 					<FontAwesomeIcon icon={faTable} className='text-2xl md:text-3xl text-shadow' />
 				</div>
-				<h3 className='text-sm md:text-base font-semibold'>Create Table</h3>
+				<h3 className='text-sm md:text-base font-semibold'>Edit Table</h3>
 				<p className='text-sm md:text-base font-thin'>
 					Enter the table name and then use the plus sign to add columns to the table. Choose its name, data type, and
 					other additional parameters!
@@ -133,12 +151,20 @@ const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
 			</div>
 			{columnsError && <span className='text-red-500 text-xs mt-2 text-left w-full'>{columnsError}</span>}
 			{columns.map((column, index) => (
-				<ColumnFieldItem key={index} column={column} width={660} removable={true} onDelete={() => handleDeleteColumn(index)}/>
+				<ColumnFieldItem
+					key={index}
+					column={column}
+					width={640}
+					removable={true}
+					onDelete={() => handleDeleteColumn(index)}
+				/>
 			))}
 			{showAddColumnForm && <AddColumnForm onAddColumn={handleAddColumn} />}
-			<Button className='w-full mt-10' onClick={handleSubmit}>Create New Table</Button>
+			<Button className='w-full mt-10' onClick={handleSubmit}>
+				Edit Table
+			</Button>
 		</div>
 	)
 }
 
-export default NewTableForm
+export default EditTableForm
