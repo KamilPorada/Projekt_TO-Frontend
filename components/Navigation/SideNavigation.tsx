@@ -2,11 +2,23 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBars, faXmark, faDatabase, faTable, faFileCircleQuestion } from '@fortawesome/free-solid-svg-icons'
+import {
+	faBars,
+	faXmark,
+	faDatabase,
+	faTable,
+	faAngleDown,
+	faAngleUp,
+	faArrowPointer,
+	faPlus,
+	faPenToSquare,
+	faTrash,
+} from '@fortawesome/free-solid-svg-icons'
 import Brand from '../UI/Brand'
 
 function SideBar() {
 	const [isMenuVisible, setIsMenuVisible] = useState(true)
+	const [isSubMenuVisible, setIsSubMenuVisible] = useState(false)
 
 	const currentYear = new Date().getFullYear()
 
@@ -16,6 +28,11 @@ function SideBar() {
 
 	const handleXButton = () => {
 		setIsMenuVisible(false)
+		setIsSubMenuVisible(false)
+	}
+
+	const handleSubMenuToggle = () => {
+		setIsSubMenuVisible(!isSubMenuVisible)
 	}
 
 	return (
@@ -50,12 +67,43 @@ function SideBar() {
 						</div>
 					</Link>
 					<div className='h-px w-full bg-zinc-600'></div>
-					<Link href={'/operation'}>
-						<div className='flex flex-row justify-between items-center mt-2 text-white font-thin cursor-pointer transition hover:text-mainColor hover:font-normal'>
+					<div className='relative'>
+						<div
+							className='flex flex-row justify-between items-center mt-2 text-white font-thin cursor-pointer transition hover:text-mainColor hover:font-normal'
+							onClick={handleSubMenuToggle}>
 							<p className='text-sm md:text-base'>Operation</p>
-							<FontAwesomeIcon icon={faFileCircleQuestion} />
+							<FontAwesomeIcon icon={isSubMenuVisible ? faAngleUp : faAngleDown} />
 						</div>
-					</Link>
+						{isSubMenuVisible && (
+							<div className='flex flex-col pl-2 mt-2'>
+								<Link href={''}>
+									<div className='flex flex-row justify-between items-center mt-2 text-white font-thin cursor-pointer transition hover:text-mainColor hover:font-normal'>
+										<p className='text-sm md:text-base'>Select query</p>
+										<FontAwesomeIcon icon={faArrowPointer} />
+									</div>
+								</Link>
+
+								<Link href={'/insert'}>
+									<div className='flex flex-row justify-between items-center mt-2 text-white font-thin cursor-pointer transition hover:text-mainColor hover:font-normal'>
+										<p className='text-sm md:text-base'>Insert query</p>
+										<FontAwesomeIcon icon={faPlus} />
+									</div>
+								</Link>
+								<Link href={''}>
+									<div className='flex flex-row justify-between items-center mt-2 text-white font-thin cursor-pointer transition hover:text-mainColor hover:font-normal'>
+										<p className='text-sm md:text-base'>Update query</p>
+										<FontAwesomeIcon icon={faPenToSquare} />
+									</div>
+								</Link>
+								<Link href={''}>
+									<div className='flex flex-row justify-between items-center mt-2 text-white font-thin cursor-pointer transition hover:text-mainColor hover:font-normal'>
+										<p className='text-sm md:text-base'>Delete query</p>
+										<FontAwesomeIcon icon={faTrash} />
+									</div>
+								</Link>
+							</div>
+						)}
+					</div>
 					<div className='h-px w-full bg-zinc-600'></div>
 				</div>
 				<footer className='absolute bottom-0 w-full -mx-2 mb-2 flex flex-col text-center text-white text-xs sm:text-sm font-light'>
