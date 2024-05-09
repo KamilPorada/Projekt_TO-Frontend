@@ -20,22 +20,23 @@ interface TableColumn {
 	isAutoincrement: boolean
 	isUnique: boolean
 	isNotNull: boolean
+	editMode: number // 1 - dodawane, 2 - modyfikowane, 3 - usuwane
 }
 
 interface Props {
-    onTableCreated: () => void;
+	onTableCreated: () => void
 }
 
 const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
 	const [tableName, setTableName] = useState<string>('')
 	const [columns, setColumns] = useState<TableColumn[]>([])
+	const [editedColumn, setEditedColumn] = useState<TableColumn | undefined>(undefined)
 	const [showAddColumnForm, setShowAddColumnForm] = useState<boolean>(false)
 	const [isTableNameEntered, setIsTableNameEntered] = useState<boolean>(false)
 	const [tableNameError, setTableNameError] = useState<string>('')
 	const [columnsError, setColumnsError] = useState<string>('')
 
 	const handleSubmit = async () => {
-
 		if (!isTableNameEntered) {
 			setTableNameError('Table name is required')
 			return
@@ -50,7 +51,6 @@ const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
 			tableName: tableName,
 			columns: columns,
 		}
-
 
 		// try {
 		//     const response = await fetch('URL', {
@@ -72,24 +72,42 @@ const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
 		toast.success('Pomyślnie dodano nową tabelę!', {
 			position: 'top-center',
 		})
-		onTableCreated();
+		onTableCreated()
 	}
 
 	const handleAddColumn = (newColumn: TableColumn) => {
-		setColumns(prevColumns => [...prevColumns, newColumn])
-
-		if (columns.length < -1) {
-			setColumnsError('No columns added to the table')
+		const isEditingExistingColumn = columns.some(col => col === editedColumn)
+		
+		if (isEditingExistingColumn) {
+			setColumns(prevColumns => {
+				const updatedColumns = prevColumns.map(col => {
+					if (col === editedColumn) {
+						return newColumn;
+					}
+					return col;
+				});
+				return updatedColumns;
+			});
 		} else {
-			setColumnsError('')
+			setColumns(prevColumns => [...prevColumns, newColumn]);
 		}
 
-		setShowAddColumnForm(false)
+		newColumn.editMode = 1;  //nowa kolumna podczas tworzenia nowej tabeli (niezależnie czy jest ona dodana czy edytowana podczas tworzenia nowej tabeli to jest ona cały czas nowa dla backednu)
+		setShowAddColumnForm(false);
+		setEditedColumn(undefined);
+	}
+
+	const handleEditColumn = (editedColumn: TableColumn) => {
+		setEditedColumn(editedColumn) 
+		setShowAddColumnForm(true) 
 	}
 
 	const handleDeleteColumn = (index: number) => {
-		setColumns(prevColumns => prevColumns.filter((_, i) => i !== index));
-	};
+		setColumns(prevColumns => {
+			const updatedColumns = [...prevColumns]
+			return updatedColumns.filter((_, i) => i !== index)
+		})
+	}
 
 	const handleTableNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value
@@ -133,10 +151,21 @@ const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
 			</div>
 			{columnsError && <span className='text-red-500 text-xs mt-2 text-left w-full'>{columnsError}</span>}
 			{columns.map((column, index) => (
-				<ColumnFieldItem key={index} column={column} width={660} removable={true} onDelete={() => handleDeleteColumn(index)}/>
+				<ColumnFieldItem
+					key={index}
+					column={column}
+					width={660}
+					removable={true}
+					onDelete={() => handleDeleteColumn(index)}
+					onEdit={() => handleEditColumn(column)}
+				/>
 			))}
-			{showAddColumnForm && <AddColumnForm onAddColumn={handleAddColumn} />}
-			<Button className='w-full mt-10' onClick={handleSubmit}>Create New Table</Button>
+			{showAddColumnForm && <AddColumnForm onAddColumn={handleAddColumn} editedColumn={editedColumn} columns={columns} />}
+
+
+			<Button className='w-full mt-10' onClick={handleSubmit}>
+				Create New Table
+			</Button>
 		</div>
 	)
 }

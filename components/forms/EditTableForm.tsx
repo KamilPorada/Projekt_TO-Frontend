@@ -22,6 +22,7 @@ interface Table {
 		isAutoincrement: boolean
 		isUnique: boolean
 		isNotNull: boolean
+		editMode: number // 1 - dodawane, 2 - modyfikowane, 3 - usuwane
 	}[]
 }
 
@@ -37,6 +38,7 @@ interface TableColumn {
 	isAutoincrement: boolean
 	isUnique: boolean
 	isNotNull: boolean
+	editMode: number
 }
 
 interface EditTableFormProps {
@@ -47,13 +49,14 @@ interface EditTableFormProps {
 const EditTableForm: React.FC<EditTableFormProps> = ({ editedTable, onTableEdited }) => {
 	const [tableName, setTableName] = useState<string>(editedTable ? editedTable.name : '')
 	const [columns, setColumns] = useState<TableColumn[]>(editedTable?.columns || [])
+	const [editedColumn, setEditedColumn] = useState<TableColumn | undefined>(undefined)
 	const [showAddColumnForm, setShowAddColumnForm] = useState<boolean>(false)
 	const [isTableNameEntered, setIsTableNameEntered] = useState<boolean>(false)
 	const [tableNameError, setTableNameError] = useState<string>('')
 	const [columnsError, setColumnsError] = useState<string>('')
 
 	const handleSubmit = async () => {
-		if (!isTableNameEntered) {
+		if (!isTableNameEntered && tableName.trim() !== editedTable?.name) {
 			setTableNameError('Table name is required')
 			return
 		}
@@ -94,19 +97,38 @@ const EditTableForm: React.FC<EditTableFormProps> = ({ editedTable, onTableEdite
 	}
 
 	const handleAddColumn = (newColumn: TableColumn) => {
-		setColumns(prevColumns => [...prevColumns, newColumn])
+		const isEditingExistingColumn = columns.some(col => col === editedColumn)
 
-		if (columns.length < -1) {
-			setColumnsError('No columns added to the table')
+		if (isEditingExistingColumn) {
+			setColumns(prevColumns => {
+				const updatedColumns = prevColumns.map(col => {
+					if (col === editedColumn) {
+						return newColumn
+					}
+					return col
+				})
+				return updatedColumns
+			})
+			newColumn.editMode = 2 //edytowana kolumna podczas edycji tabeli
 		} else {
-			setColumnsError('')
+			setColumns(prevColumns => [...prevColumns, newColumn])
+			newColumn.editMode = 1 //nowa kolumna podczas edycji abeli
 		}
-
 		setShowAddColumnForm(false)
+		setEditedColumn(undefined)
+	}
+
+	const handleEditColumn = (editedColumn: TableColumn) => {
+		setEditedColumn(editedColumn)
+		setShowAddColumnForm(true)
 	}
 
 	const handleDeleteColumn = (index: number) => {
-		setColumns(prevColumns => prevColumns.filter((_, i) => i !== index))
+		setColumns(prevColumns => {
+			const updatedColumns = [...prevColumns]
+			updatedColumns.splice(index, 1)
+			return updatedColumns.map(column => ({ ...column, editMode: 3 })) //usuwana kolumna podczas edycji tabeli
+		})
 	}
 
 	const handleTableNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,9 +179,12 @@ const EditTableForm: React.FC<EditTableFormProps> = ({ editedTable, onTableEdite
 					width={640}
 					removable={true}
 					onDelete={() => handleDeleteColumn(index)}
+					onEdit={() => handleEditColumn(column)}
 				/>
 			))}
-			{showAddColumnForm && <AddColumnForm onAddColumn={handleAddColumn} />}
+			{showAddColumnForm && (
+				<AddColumnForm onAddColumn={handleAddColumn} editedColumn={editedColumn} columns={columns} />
+			)}
 			<Button className='w-full mt-10' onClick={handleSubmit}>
 				Edit Table
 			</Button>

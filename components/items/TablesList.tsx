@@ -17,6 +17,7 @@ interface Table {
 		isAutoincrement: boolean
 		isUnique: boolean
 		isNotNull: boolean
+		editMode: number
 	}[]
 }
 
@@ -43,6 +44,7 @@ const TablesList: React.FC<{
 					isAutoincrement: true,
 					isUnique: true,
 					isNotNull: true,
+					editMode: 1,
 				},
 				{
 					fieldName: 'username',
@@ -56,6 +58,7 @@ const TablesList: React.FC<{
 					isAutoincrement: false,
 					isUnique: false,
 					isNotNull: true,
+					editMode: 1,
 				},
 				{
 					fieldName: 'email',
@@ -69,6 +72,7 @@ const TablesList: React.FC<{
 					isAutoincrement: false,
 					isUnique: true,
 					isNotNull: true,
+					editMode: 1,
 				},
 			],
 		},
@@ -87,6 +91,7 @@ const TablesList: React.FC<{
 					isAutoincrement: true,
 					isUnique: true,
 					isNotNull: true,
+					editMode: 1,
 				},
 				{
 					fieldName: 'name',
@@ -100,6 +105,7 @@ const TablesList: React.FC<{
 					isAutoincrement: false,
 					isUnique: false,
 					isNotNull: true,
+					editMode: 1,
 				},
 				{
 					fieldName: 'price',
@@ -113,6 +119,7 @@ const TablesList: React.FC<{
 					isAutoincrement: false,
 					isUnique: false,
 					isNotNull: true,
+					editMode: 1,
 				},
 			],
 		},
@@ -131,6 +138,7 @@ const TablesList: React.FC<{
 					isAutoincrement: true,
 					isUnique: true,
 					isNotNull: true,
+					editMode: 1,
 				},
 				{
 					fieldName: 'product_id',
@@ -144,6 +152,7 @@ const TablesList: React.FC<{
 					isAutoincrement: false,
 					isUnique: false,
 					isNotNull: true,
+					editMode: 1,
 				},
 				{
 					fieldName: 'quantity',
@@ -157,6 +166,7 @@ const TablesList: React.FC<{
 					isAutoincrement: false,
 					isUnique: false,
 					isNotNull: true,
+					editMode: 1,
 				},
 			],
 		},
@@ -203,7 +213,7 @@ const TablesList: React.FC<{
 			console.log(`Nie znaleziono tabeli o nazwie ${tableName}`)
 		}
 	}
-	
+
 	useEffect(() => {
 		// fetchTables()
 		setAllTables(dummyTables)

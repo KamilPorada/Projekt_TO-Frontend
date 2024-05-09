@@ -18,6 +18,7 @@ const TableItem: React.FC<{
 		isAutoincrement: boolean
 		isUnique: boolean
 		isNotNull: boolean
+		editMode: number
 	}[]
 	handleDelete: () => Promise<void>
 	handleEdit: (tableName: string) => void
@@ -60,7 +61,14 @@ const TableItem: React.FC<{
 				</div>
 				<div className='flex flex-col justify-center items-center p-2'>
 					{props.columns.map((column, index) => (
-						<ColumnFieldItem key={index} column={column} width={500} removable={false}  onDelete={() => null} />
+						<ColumnFieldItem
+							key={index}
+							column={column}
+							width={500}
+							removable={false}
+							onDelete={() => null}
+							onEdit={() => null}
+						/>
 					))}
 				</div>
 			</div>

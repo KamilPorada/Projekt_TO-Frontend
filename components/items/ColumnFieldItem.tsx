@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faKey, faCircle, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faKey, faCircle, faTrash, faPenToSquare } from '@fortawesome/free-solid-svg-icons'
 
 interface Props {
 	width: number
@@ -15,12 +15,14 @@ interface Props {
 		isAutoincrement: boolean
 		isUnique: boolean
 		isNotNull: boolean
+		editMode: number
 	}
 	removable: boolean
 	onDelete: () => void
+	onEdit: () => void
 }
 
-const ColumnFieldItem: React.FC<Props> = ({ column, width, onDelete, removable }) => {
+const ColumnFieldItem: React.FC<Props> = ({ column, width, onDelete, removable, onEdit }) => {
 	const fieldType =
 		column.fieldType === 'decimal'
 			? 'decimal(' + column.fieldSize1 + ',' + column.fieldSize2 + ')'
@@ -60,7 +62,10 @@ const ColumnFieldItem: React.FC<Props> = ({ column, width, onDelete, removable }
 				</div>
 				<p className='w-32 mr-2 text-sm uppercase'>{fieldType}</p>
 				<p className='w-96 text-sm'>{additionalParametersString}</p>
-				<div onClick={handleDeleteClick} className={`${removable ? 'block' : 'hidden'}`}>
+				<div onClick={onEdit} className={`${removable ? 'block' : 'hidden'}`}>
+					<FontAwesomeIcon icon={faPenToSquare} className='text-blue-500 w-4 cursor-pointer' />
+				</div>
+				<div onClick={handleDeleteClick} className={`${removable ? 'block' : 'hidden'} mx-1`}>
 					<FontAwesomeIcon icon={faTrash} className='text-red-700 w-4 cursor-pointer' />
 				</div>
 			</div>
