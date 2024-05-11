@@ -23,6 +23,11 @@ interface Props {
 }
 
 const ColumnFieldItem: React.FC<Props> = ({ column, width, onDelete, removable, onEdit }) => {
+	const editModeClass: { [key: number]: string } = {
+		1: 'bg-green-100',
+		2: 'bg-blue-100',
+		3: 'bg-red-100',
+	}
 	const fieldType =
 		column.fieldType === 'decimal'
 			? 'decimal(' + column.fieldSize1 + ',' + column.fieldSize2 + ')'
@@ -45,7 +50,9 @@ const ColumnFieldItem: React.FC<Props> = ({ column, width, onDelete, removable, 
 
 	return (
 		<div
-			className={`flex flex-row justify-between items-center w-[${width}px] border-b overflow-x-auto font-thin mt-1`}>
+			className={`flex flex-row justify-between items-center w-[${width}px] border-b overflow-x-auto font-thin mt-1 p-1 ${
+				editModeClass[column.editMode] || ''
+			}`}>
 			<div className='flex flex-row justify-between items-center w-full h-full'>
 				<div className='flex flex-row justify-center items-center gap-2 w-24'>
 					<FontAwesomeIcon

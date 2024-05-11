@@ -20,7 +20,7 @@ interface TableColumn {
 	isAutoincrement: boolean
 	isUnique: boolean
 	isNotNull: boolean
-	editMode: number // 1 - dodawane, 2 - modyfikowane, 3 - usuwane
+	editMode: number //0 - niezmienione 1 - dodawane, 2 - modyfikowane, 3 - usuwane
 }
 
 interface Props {
@@ -92,7 +92,7 @@ const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
 			setColumns(prevColumns => [...prevColumns, newColumn]);
 		}
 
-		newColumn.editMode = 1;  //nowa kolumna podczas tworzenia nowej tabeli (niezależnie czy jest ona dodana czy edytowana podczas tworzenia nowej tabeli to jest ona cały czas nowa dla backednu)
+		newColumn.editMode = 0; 
 		setShowAddColumnForm(false);
 		setEditedColumn(undefined);
 	}

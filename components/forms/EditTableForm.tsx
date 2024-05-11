@@ -125,11 +125,15 @@ const EditTableForm: React.FC<EditTableFormProps> = ({ editedTable, onTableEdite
 
 	const handleDeleteColumn = (index: number) => {
 		setColumns(prevColumns => {
-			const updatedColumns = [...prevColumns]
-			updatedColumns.splice(index, 1)
-			return updatedColumns.map(column => ({ ...column, editMode: 3 })) //usuwana kolumna podczas edycji tabeli
-		})
-	}
+			return prevColumns.map((column, columnIndex) => {
+				if (columnIndex === index) {
+					return { ...column, editMode: 3 }; //usuwana kolumna podczas edycji tabeli
+				}
+				return column;
+			});
+		});
+	};
+	
 
 	const handleTableNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value

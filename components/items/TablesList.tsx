@@ -4,7 +4,7 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 interface Table {
-	name: string
+	tableName: string
 	columns: {
 		fieldName: string
 		fieldType: string
@@ -30,7 +30,7 @@ const TablesList: React.FC<{
 
 	const dummyTables: Table[] = [
 		{
-			name: 'users',
+			tableName: 'users',
 			columns: [
 				{
 					fieldName: 'id',
@@ -44,7 +44,7 @@ const TablesList: React.FC<{
 					isAutoincrement: true,
 					isUnique: true,
 					isNotNull: true,
-					editMode: 1,
+					editMode: 0,
 				},
 				{
 					fieldName: 'username',
@@ -58,7 +58,7 @@ const TablesList: React.FC<{
 					isAutoincrement: false,
 					isUnique: false,
 					isNotNull: true,
-					editMode: 1,
+					editMode: 0,
 				},
 				{
 					fieldName: 'email',
@@ -72,12 +72,12 @@ const TablesList: React.FC<{
 					isAutoincrement: false,
 					isUnique: true,
 					isNotNull: true,
-					editMode: 1,
+					editMode: 0,
 				},
 			],
 		},
 		{
-			name: 'products',
+			tableName: 'products',
 			columns: [
 				{
 					fieldName: 'id',
@@ -91,7 +91,7 @@ const TablesList: React.FC<{
 					isAutoincrement: true,
 					isUnique: true,
 					isNotNull: true,
-					editMode: 1,
+					editMode: 0,
 				},
 				{
 					fieldName: 'name',
@@ -105,7 +105,7 @@ const TablesList: React.FC<{
 					isAutoincrement: false,
 					isUnique: false,
 					isNotNull: true,
-					editMode: 1,
+					editMode: 0,
 				},
 				{
 					fieldName: 'price',
@@ -119,12 +119,12 @@ const TablesList: React.FC<{
 					isAutoincrement: false,
 					isUnique: false,
 					isNotNull: true,
-					editMode: 1,
+					editMode: 0,
 				},
 			],
 		},
 		{
-			name: 'orders',
+			tableName: 'orders',
 			columns: [
 				{
 					fieldName: 'id',
@@ -138,7 +138,7 @@ const TablesList: React.FC<{
 					isAutoincrement: true,
 					isUnique: true,
 					isNotNull: true,
-					editMode: 1,
+					editMode: 0,
 				},
 				{
 					fieldName: 'product_id',
@@ -152,7 +152,7 @@ const TablesList: React.FC<{
 					isAutoincrement: false,
 					isUnique: false,
 					isNotNull: true,
-					editMode: 1,
+					editMode: 0,
 				},
 				{
 					fieldName: 'quantity',
@@ -166,7 +166,7 @@ const TablesList: React.FC<{
 					isAutoincrement: false,
 					isUnique: false,
 					isNotNull: true,
-					editMode: 1,
+					editMode: 0,
 				},
 			],
 		},
@@ -191,7 +191,7 @@ const TablesList: React.FC<{
 			// 	method: 'DELETE',
 			// })
 
-			const filteredTables = allTables.filter(table => table.name !== tableName)
+			const filteredTables = allTables.filter(table => table.tableName !== tableName)
 
 			toast.success('Pomyślnie usunięto tabelę!', {
 				position: 'top-center',
@@ -206,7 +206,7 @@ const TablesList: React.FC<{
 	}
 
 	const handleEdit = (tableName: string) => {
-		const editedTable = allTables.find(table => table.name === tableName)
+		const editedTable = allTables.find(table => table.tableName === tableName)
 		if (editedTable) {
 			props.handleEdit(editedTable)
 		} else {
@@ -234,10 +234,10 @@ const TablesList: React.FC<{
 			{filteredTables.length > 0 ? (
 				filteredTables.map(table => (
 					<TableItem
-						key={table.name}
-						name={table.name}
+						key={table.tableName}
+						tableName={table.tableName}
 						columns={table.columns}
-						handleDelete={() => handleDelete(table.name)}
+						handleDelete={() => handleDelete(table.tableName)}
 						handleEdit={handleEdit}
 					/>
 				))

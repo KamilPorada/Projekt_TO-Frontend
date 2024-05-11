@@ -5,7 +5,7 @@ import { faTable, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-ico
 import Button from '../UI/Button'
 
 const TableItem: React.FC<{
-	name: string
+	tableName: string
 	columns: {
 		fieldName: string
 		fieldType: string
@@ -44,13 +44,13 @@ const TableItem: React.FC<{
 				<div className='flex flex-row justify-between items-center gap-3 w-full bg-mainColor p-2 text-white'>
 					<div className='flex flex-row gap-3'>
 						<FontAwesomeIcon icon={faTable} className='text-xl' />
-						<p>{props.name}</p>
+						<p>{props.tableName}</p>
 					</div>
 					<div className='flex flex-row gap-3'>
 						<FontAwesomeIcon
 							icon={faPenToSquare}
 							className='text-xl hover:text-secondaryColor transition-colors cursor-pointer'
-							onClick={() => props.handleEdit(props.name)}
+							onClick={() => props.handleEdit(props.tableName)}
 						/>
 						<FontAwesomeIcon
 							icon={faTrash}
