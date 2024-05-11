@@ -4,6 +4,7 @@ import Button from '../UI/Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 
+
 interface TableColumn {
 	fieldName: string
 	fieldType: string
@@ -28,7 +29,6 @@ const InsertQueryForm: React.FC = () => {
 	const [selectedTableColumns, setSelectedTableColumns] = useState<TableColumn[]>([])
 	const [columnValues, setColumnValues] = useState<{ [key: string]: string }>({})
 
-	// Sample dummyTables fetched from the server
 	const dummyTables: Table[] = [
 		{
 			name: 'users',
@@ -236,7 +236,7 @@ const InsertQueryForm: React.FC = () => {
 					value={tableName}
 					onChange={handleTableChange}
 					className='p-1 mt-1 bg-gray-100 rounded-sm shadow-md focus:outline-mainColor'>
-					<option value=''>Select Table</option>
+					<option value=''>table</option>
 					{dummyTables.map(table => (
 						<option key={table.name} value={table.name}>
 							{table.name}

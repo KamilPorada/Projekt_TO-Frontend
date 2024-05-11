@@ -9,7 +9,7 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 interface Table {
-	name: string
+	tableName: string
 	columns: {
 		fieldName: string
 		fieldType: string
@@ -47,7 +47,7 @@ interface EditTableFormProps {
 }
 
 const EditTableForm: React.FC<EditTableFormProps> = ({ editedTable, onTableEdited }) => {
-	const [tableName, setTableName] = useState<string>(editedTable ? editedTable.name : '')
+	const [tableName, setTableName] = useState<string>(editedTable ? editedTable.tableName : '')
 	const [columns, setColumns] = useState<TableColumn[]>(editedTable?.columns || [])
 	const [editedColumn, setEditedColumn] = useState<TableColumn | undefined>(undefined)
 	const [showAddColumnForm, setShowAddColumnForm] = useState<boolean>(false)
@@ -56,7 +56,7 @@ const EditTableForm: React.FC<EditTableFormProps> = ({ editedTable, onTableEdite
 	const [columnsError, setColumnsError] = useState<string>('')
 
 	const handleSubmit = async () => {
-		if (!isTableNameEntered && tableName.trim() !== editedTable?.name) {
+		if (!isTableNameEntered && tableName.trim() !== editedTable?.tableName) {
 			setTableNameError('Table name is required')
 			return
 		}

@@ -89,7 +89,7 @@ function SideBar() {
 										<FontAwesomeIcon icon={faPlus} />
 									</div>
 								</Link>
-								<Link href={''}>
+								<Link href={'/updatee'}>
 									<div className='flex flex-row justify-between items-center mt-2 text-white font-thin cursor-pointer transition hover:text-mainColor hover:font-normal'>
 										<p className='text-sm md:text-base'>Update query</p>
 										<FontAwesomeIcon icon={faPenToSquare} />
