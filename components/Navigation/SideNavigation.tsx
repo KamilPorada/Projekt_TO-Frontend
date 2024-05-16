@@ -95,7 +95,7 @@ function SideBar() {
 										<FontAwesomeIcon icon={faPenToSquare} />
 									</div>
 								</Link>
-								<Link href={''}>
+								<Link href={'/delete'}>
 									<div className='flex flex-row justify-between items-center mt-2 text-white font-thin cursor-pointer transition hover:text-mainColor hover:font-normal'>
 										<p className='text-sm md:text-base'>Delete query</p>
 										<FontAwesomeIcon icon={faTrash} />

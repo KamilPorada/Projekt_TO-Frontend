@@ -288,7 +288,7 @@ const InsertQueryForm: React.FC = () => {
 						</div>
 					)
 			)}
-			<Button className='w-full mt-10'>Insert Row</Button>
+			<Button className='w-full mt-5'>Insert Row</Button>
 		</form>
 	)
 }
