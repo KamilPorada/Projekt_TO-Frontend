@@ -4,7 +4,6 @@ import Button from '../UI/Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 
-
 interface TableColumn {
 	fieldName: string
 	fieldType: string
@@ -211,26 +210,34 @@ const InsertQueryForm: React.FC = () => {
 	}
 
 	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-		const columnNames = Object.keys(columnValues);
+		event.preventDefault()
+		const columnNames = Object.keys(columnValues)
 		const jsonData = {
 			tableName: tableName,
-			columns: columnNames.map(columnName => ({
-				[columnName]: columnValues[columnName]
-			}))
+			columns: columnNames.map(columnName => {
+				const column = selectedTableColumns.find(col => col.fieldName === columnName);
+		
+				if (column && column.isPrimaryKey && column.fieldType === 'integer' && column.isAutoincrement) {
+					return null; 
+				} else {
+					return {
+						columnName: columnName,
+						value: columnValues[columnName]
+					};
+				}
+			}).filter(column => column !== null)
 		};
-
 		console.log(jsonData)
-	
+
 		// try {
 		// 	const response = await fetch('URL', {
 		// 		method: 'POST',
 		// 		headers: {
 		// 			'Content-Type': 'application/json'
 		// 		},
-		// 		body: JSON.stringify(jsonData)
+		// 		body: JSON.stringify(dataToSend)
 		// 	});
-	
+
 		// 	if (response.ok) {
 		// 		console.log('Data sent successfully');
 		// 	} else {
@@ -239,8 +246,7 @@ const InsertQueryForm: React.FC = () => {
 		// } catch (error) {
 		// 	console.error('Error sending data:', error);
 		// }
-	};
-	
+	}
 
 	return (
 		<form

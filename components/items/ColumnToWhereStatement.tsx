@@ -44,6 +44,37 @@ const ColumnToWhereStatementItem: React.FC<ColumnToWhereStatementItemProps> = ({
 		onInputChange(index, whereColumnName, whereColumnSign, event.target.value)
 	}
 
+	const getFieldTypeFromColumnName = (columnName: string): string | undefined => {
+		const column = columns.find(column => column.fieldName === columnName)
+		return column ? column.fieldType : undefined
+	}
+
+	const getInputType = (fieldType: string): string => {
+		switch (fieldType) {
+			case 'integer':
+				return 'number'
+			case 'bool':
+				return 'checkbox'
+			case 'float':
+			case 'double':
+			case 'decimal':
+				return 'number'
+			case 'date':
+			case 'datetime':
+			case 'timestamp':
+				return 'datetime-local'
+			case 'time':
+				return 'time'
+			case 'char':
+			case 'varchar':
+				return 'text'
+			default:
+				return 'text'
+		}
+	}
+
+	const fieldType = getFieldTypeFromColumnName(whereColumnName)
+
 	return (
 		<div className='flex flex-row justify-between items-center w-full gap-1'>
 			<div className='flex flex-col w-full text-sm'>
@@ -78,7 +109,7 @@ const ColumnToWhereStatementItem: React.FC<ColumnToWhereStatementItemProps> = ({
 			<div className='flex flex-col w-full text-sm'>
 				<label>Where Value:</label>
 				<input
-					type='text'
+					type={getInputType(fieldType || '')}
 					value={whereColumnValue}
 					onChange={handleWhereColumnValueChange}
 					className='p-1 mt-1 bg-gray-100 rounded-sm shadow-md focus:outline-mainColor'

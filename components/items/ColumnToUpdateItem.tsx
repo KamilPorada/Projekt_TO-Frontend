@@ -31,12 +31,43 @@ const ColumnToUpdateItem: React.FC<ColumnToUpdateItemProps> = ({
 	onInputChange,
 }) => {
 	const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-		onInputChange(index, event.target.value, columnValue) 
+		onInputChange(index, event.target.value, columnValue)
 	}
 
 	const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		onInputChange(index, columnName, event.target.value)
 	}
+
+	const getFieldTypeFromColumnName = (columnName: string): string | undefined => {
+		const column = columns.find(column => column.fieldName === columnName)
+		return column ? column.fieldType : undefined
+	}
+
+	const getInputType = (fieldType: string): string => {
+		switch (fieldType) {
+			case 'integer':
+				return 'number'
+			case 'bool':
+				return 'checkbox'
+			case 'float':
+			case 'double':
+			case 'decimal':
+				return 'number'
+			case 'date':
+			case 'datetime':
+			case 'timestamp':
+				return 'datetime-local'
+			case 'time':
+				return 'time'
+			case 'char':
+			case 'varchar':
+				return 'text'
+			default:
+				return 'text'
+		}
+	}
+
+	const fieldType = getFieldTypeFromColumnName(columnName)
 
 	return (
 		<div className='flex flex-row justify-between items-center w-full gap-1 divek'>
@@ -57,7 +88,7 @@ const ColumnToUpdateItem: React.FC<ColumnToUpdateItemProps> = ({
 			<div className='flex flex-col w-full text-sm'>
 				<label>New Value:</label>
 				<input
-					type='text'
+					type={getInputType(fieldType || '')}
 					value={columnValue}
 					onChange={handleInputChange}
 					className='p-1 mt-1 bg-gray-100 rounded-sm shadow-md focus:outline-mainColor'
