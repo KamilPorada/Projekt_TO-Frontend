@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faKey, faCircle, faTrash, faPenToSquare } from '@fortawesome/free-solid-svg-icons'
+import { faKey, faCircle, faTrash, faPenToSquare, faRotateLeft } from '@fortawesome/free-solid-svg-icons'
 
 interface Props {
 	width: number
@@ -73,7 +73,7 @@ const ColumnFieldItem: React.FC<Props> = ({ column, width, onDelete, removable, 
 					<FontAwesomeIcon icon={faPenToSquare} className='text-blue-500 w-4 cursor-pointer' />
 				</div>
 				<div onClick={handleDeleteClick} className={`${removable ? 'block' : 'hidden'} mx-1`}>
-					<FontAwesomeIcon icon={faTrash} className='text-red-700 w-4 cursor-pointer' />
+					<FontAwesomeIcon icon={column.editMode===3 ? faRotateLeft : faTrash} className='text-red-700 w-4 cursor-pointer' />
 				</div>
 			</div>
 		</div>

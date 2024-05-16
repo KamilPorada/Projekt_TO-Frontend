@@ -96,22 +96,23 @@ const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
 			position: 'top-center',
 		})
 		onTableCreated()
+		
 		try {
 			const acceptResponse = await fetch('URL', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ accept: true })
+				body: JSON.stringify(sqlCode)
 			});
 		
 			if (acceptResponse.ok) {
-				console.log('Accept flag sent successfully');
+				console.log('Sql code sent successfully');
 			} else {
-				console.error('Failed to send accept flag');
+				console.error('Failed to send sql code');
 			}
 		} catch (error) {
-			console.error('Error sending accept flag:', error);
+			console.error('Error sending sql code:', error);
 		}
 	}
 
@@ -186,7 +187,7 @@ const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
 				</div>
 				<div className='flex flex-row justify-between items-center w-full mt-5'>
 					<p className='text-sm text-left'>Table Columns</p>
-					<Button className='flex justify-center items-center px-4' onClick={() => setShowAddColumnForm(true)}>
+					<Button className='flex justify-center items-center px-3' onClick={() => setShowAddColumnForm(true)}>
 						<FontAwesomeIcon className='text-xs' icon={faPlus} />
 					</Button>
 				</div>

@@ -127,11 +127,11 @@ const EditTableForm: React.FC<EditTableFormProps> = ({ editedTable, onTableEdite
 		setColumns(prevColumns => {
 			return prevColumns.map((column, columnIndex) => {
 				if (columnIndex === index) {
-					return { ...column, editMode: 3 }; //usuwana kolumna podczas edycji tabeli
+					return { ...column, editMode: column.editMode === 3 ? 0 : 3 };
 				}
 				return column;
 			});
-		});
+		});		
 	};
 	
 

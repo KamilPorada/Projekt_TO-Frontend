@@ -1,8 +1,10 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Button from '../UI/Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPenToSquare } from '@fortawesome/free-solid-svg-icons'
+import { faPenToSquare, faPlus } from '@fortawesome/free-solid-svg-icons'
+import ColumnToUpdateItem from '../Items/ColumnToUpdateItem'
+import ColumnToWhereStatementItem from '../Items/ColumnToWhereStatement'
 
 interface TableColumn {
 	fieldName: string
@@ -16,6 +18,7 @@ interface TableColumn {
 	isAutoincrement: boolean
 	isUnique: boolean
 	isNotNull: boolean
+	editMode: number
 }
 
 interface Table {
@@ -26,10 +29,17 @@ interface Table {
 const UpdateQueryForm: React.FC = () => {
 	const [tableName, setTableName] = useState<string>('')
 	const [selectedTableColumns, setSelectedTableColumns] = useState<TableColumn[]>([])
-	const [updateColumnName, setUpdateColumnName] = useState<string>('')
-	const [updateColumnValue, setUpdateColumnValue] = useState<string>('')
-	const [whereColumnName, setWhereColumnName] = useState<string>('')
-	const [whereColumnValue, setWhereColumnValue] = useState<string>('')
+	const [selectedWhereTableColumns, setWhereSelectedTableColumns] = useState<TableColumn[]>([])
+
+	const initialColumnValues = [{ columnName: '', columnValue: '' }]
+	const [columnValues, setColumnValues] = useState(initialColumnValues)
+	const initialWhereStatementValues = [{ whereColumnName: '', whereColumnSign: '', whereColumnValue: '' }]
+	const [whereStatementValues, setWhereStatementValues] = useState(initialWhereStatementValues)
+	const [whereColumnOperatorValue, setWhereColumnOperatorValue] = useState([{ whereOperator: '' }])
+
+	const [isOperator, setIsOperator] = useState<boolean>(true)
+
+	const [numbersOfColumnToShow, setNumbersOfColumnToShow] = useState<number>(1)
 
 	const dummyTables: Table[] = [
 		{
@@ -47,6 +57,7 @@ const UpdateQueryForm: React.FC = () => {
 					isAutoincrement: true,
 					isUnique: true,
 					isNotNull: true,
+					editMode: 0,
 				},
 				{
 					fieldName: 'username',
@@ -60,6 +71,7 @@ const UpdateQueryForm: React.FC = () => {
 					isAutoincrement: false,
 					isUnique: false,
 					isNotNull: true,
+					editMode: 0,
 				},
 				{
 					fieldName: 'email',
@@ -73,6 +85,7 @@ const UpdateQueryForm: React.FC = () => {
 					isAutoincrement: false,
 					isUnique: true,
 					isNotNull: true,
+					editMode: 0,
 				},
 			],
 		},
@@ -91,6 +104,7 @@ const UpdateQueryForm: React.FC = () => {
 					isAutoincrement: true,
 					isUnique: true,
 					isNotNull: true,
+					editMode: 0,
 				},
 				{
 					fieldName: 'name',
@@ -104,6 +118,7 @@ const UpdateQueryForm: React.FC = () => {
 					isAutoincrement: false,
 					isUnique: false,
 					isNotNull: true,
+					editMode: 0,
 				},
 				{
 					fieldName: 'price',
@@ -117,6 +132,7 @@ const UpdateQueryForm: React.FC = () => {
 					isAutoincrement: false,
 					isUnique: false,
 					isNotNull: true,
+					editMode: 0,
 				},
 			],
 		},
@@ -135,6 +151,7 @@ const UpdateQueryForm: React.FC = () => {
 					isAutoincrement: true,
 					isUnique: true,
 					isNotNull: true,
+					editMode: 0,
 				},
 				{
 					fieldName: 'product_id',
@@ -148,6 +165,7 @@ const UpdateQueryForm: React.FC = () => {
 					isAutoincrement: false,
 					isUnique: false,
 					isNotNull: true,
+					editMode: 0,
 				},
 				{
 					fieldName: 'quantity',
@@ -161,6 +179,7 @@ const UpdateQueryForm: React.FC = () => {
 					isAutoincrement: false,
 					isUnique: false,
 					isNotNull: true,
+					editMode: 0,
 				},
 			],
 		},
@@ -169,45 +188,93 @@ const UpdateQueryForm: React.FC = () => {
 	const handleTableChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
 		const selectedTableName = event.target.value
 		const selectedTable = dummyTables.find(table => table.name === selectedTableName)
+
 		if (selectedTable) {
+			const filteredColumns = selectedTable.columns.filter(
+				column => !(column.fieldType === 'integer' && column.isPrimaryKey && column.isAutoincrement)
+			)
+			setNumbersOfColumnToShow(filteredColumns.length)
+
 			setTableName(selectedTableName)
-			setSelectedTableColumns(selectedTable.columns)
-			setUpdateColumnName('')
-			setUpdateColumnValue('')
-			setWhereColumnName('')
-			setWhereColumnValue('')
+			setSelectedTableColumns(filteredColumns)
+			setWhereSelectedTableColumns(selectedTable.columns)
 		}
 	}
 
-	const handleUpdateColumnChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-		setUpdateColumnName(event.target.value)
+	const handleInputChange = (index: number, columnName: string, columnValue: string) => {
+		const newInputSelectValues = [...columnValues]
+		newInputSelectValues[index] = { columnName, columnValue }
+		setColumnValues(newInputSelectValues)
 	}
 
-	const handleUpdateValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setUpdateColumnValue(event.target.value)
+	const handleWhereInputChange = (
+		index: number,
+		whereColumnName: string,
+		whereColumnSign: string,
+		whereColumnValue: string
+	) => {
+		const newInputSelectValues = [...whereStatementValues]
+		newInputSelectValues[index] = { whereColumnName, whereColumnSign, whereColumnValue }
+		setWhereStatementValues(newInputSelectValues)
 	}
 
-	const handleWhereColumnChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-		setWhereColumnName(event.target.value)
+	const handleAddField = () => {
+		if (columnValues.length < numbersOfColumnToShow) {
+			setColumnValues([...columnValues, { columnName: '', columnValue: '' }])
+		}
 	}
 
-	const handleWhereValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		setWhereColumnValue(event.target.value)
+	const handleAddWhereField = () => {
+		if (columnValues.length < numbersOfColumnToShow) {
+			setColumnValues([...columnValues, { columnName: '', columnValue: '' }])
+		}
+
+		if (!isOperator) {
+			setWhereStatementValues([
+				...whereStatementValues,
+				{ whereColumnName: '', whereColumnSign: '', whereColumnValue: '' },
+			])
+		} else {
+			setWhereColumnOperatorValue([...whereColumnOperatorValue, { whereOperator: '' }])
+		}
+		setIsOperator(prev => !prev)
 	}
 
-	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault()
-		const data = {
+	useEffect(() => {
+		if (isOperator) {
+			setWhereColumnOperatorValue([...whereColumnOperatorValue, { whereOperator: '' }])
+		} else {
+			setWhereStatementValues([
+				...whereStatementValues,
+				{ whereColumnName: '', whereColumnSign: '', whereColumnValue: '' },
+			])
+		}
+	}, [isOperator])
+
+	const handleWhereOperatorChange = (event: React.ChangeEvent<HTMLSelectElement>, index: number) => {
+		const { value } = event.target
+		const newWhereColumnOperatorValue = [...whereColumnOperatorValue]
+		newWhereColumnOperatorValue[index] = { whereOperator: value }
+		setWhereColumnOperatorValue(newWhereColumnOperatorValue)
+	}
+
+	const handleSubmit = async () => {
+		const cleanWhereStatementValues = whereStatementValues.filter(value => {
+			return value.whereColumnName !== '' || value.whereColumnSign !== '' || value.whereColumnValue !== ''
+		})
+
+		const cleanWhereColumnOperatorValue = whereColumnOperatorValue.filter(value => {
+			return value.whereOperator !== ''
+		})
+
+		const dataToSend = {
 			tableName: tableName,
-			tableColumn: updateColumnName,
-			updateValue: updateColumnValue,
-			whereStatement: {
-				whereColumn: whereColumnName,
-				whereValue: whereColumnValue,
-			},
+			columnValues: columnValues,
+			whereStatementValues: cleanWhereStatementValues,
+			whereColumnOperatorValue: cleanWhereColumnOperatorValue,
 		}
 
-		console.log('Sending data to server:', data)
+		console.log(dataToSend)
 
 		// try {
 		// 	const response = await fetch('YOUR_API_ENDPOINT', {
@@ -229,9 +296,7 @@ const UpdateQueryForm: React.FC = () => {
 	}
 
 	return (
-		<form
-			onSubmit={handleSubmit}
-			className='flex flex-col justify-center items-center w-full sm:w-4/5 md:w-3/5 lg:w-1/2 bg-white rounded-md shadow-lg p-5'>
+		<div className='flex flex-col justify-center items-center w-full sm:w-4/5 md:w-3/5 lg:w-1/2 bg-white rounded-md shadow-lg p-5'>
 			<div className='flex flex-col justify-center items-center text-center'>
 				<div className='flex flex-row justify-center items-center gap-4 text-mainColor mb-2'>
 					<h2 className='text-xl md:text-2xl uppercase font-semibold'>Update Query</h2>
@@ -256,59 +321,70 @@ const UpdateQueryForm: React.FC = () => {
 			</div>
 			{tableName && (
 				<>
-					<div className='flex flex-col w-full mt-3 text-sm'>
-						<label>Select Column to Update:</label>
-						<select
-							value={updateColumnName}
-							onChange={handleUpdateColumnChange}
-							className='p-1 mt-1 bg-gray-100 rounded-sm shadow-md focus:outline-mainColor'>
-							<option value=''>Column</option>
-							{selectedTableColumns.map(column => (
-								<option key={column.fieldName} value={column.fieldName}>
-									{column.fieldName}
-								</option>
-							))}
-						</select>
+					<div className='flex flex-row justify-between items-center w-full my-2'>
+						<p className='text-sm'>Columns to update:</p>
+						<Button
+							className='flex justify-center items-center px-3 mx-0'
+							disabled={columnValues.length == numbersOfColumnToShow}
+							onClick={handleAddField}>
+							<FontAwesomeIcon className='text-xs' icon={faPlus} />
+						</Button>
 					</div>
-					<div className='flex flex-col w-full mt-3 text-sm'>
-						<label>New Value:</label>
-						<input
-							type='text'
-							value={updateColumnValue}
-							onChange={handleUpdateValueChange}
-							className='p-1 mt-1 bg-gray-100 rounded-sm shadow-md focus:outline-mainColor'
-						/>
-					</div>
-					<div className='flex flex-col w-full mt-3 text-sm'>
-						<p>Where Statement:</p>
-						<div className='flex flex-col w-full mt-3 text-sm'>
-							<label>Select Column for Where Statement:</label>
-							<select
-								value={whereColumnName}
-								onChange={handleWhereColumnChange}
-								className='p-1 mt-1 bg-gray-100 rounded-sm shadow-md focus:outline-mainColor'>
-								<option value=''>Column</option>
-								{selectedTableColumns.map(column => (
-									<option key={column.fieldName} value={column.fieldName}>
-										{column.fieldName}
-									</option>
-								))}
-							</select>
-						</div>
-						<div className='flex flex-col w-full mt-3 text-sm'>
-							<label>Where Value:</label>
-							<input
-								type='text'
-								value={whereColumnValue}
-								onChange={handleWhereValueChange}
-								className='p-1 mt-1 bg-gray-100 rounded-sm shadow-md focus:outline-mainColor'
+					{columnValues.map((value, index) => (
+						<div key={index} className='w-full'>
+							<ColumnToUpdateItem
+								index={index}
+								columns={selectedTableColumns}
+								columnName={value.columnName}
+								columnValue={value.columnValue}
+								onInputChange={handleInputChange}
 							/>
-						</div>{' '}
+						</div>
+					))}
+
+					<div className='flex flex-col w-full my-2 text-sm'>
+						<div className='flex flex-row justify-between items-center w-full my-2'>
+							<p className='text-sm'>Columns to where statement:</p>
+							<Button
+								className='flex justify-center items-center px-3 mx-0'
+								disabled={columnValues.length == numbersOfColumnToShow + 1}
+								onClick={handleAddWhereField}>
+								<FontAwesomeIcon className='text-xs' icon={faPlus} />
+							</Button>
+						</div>
 					</div>
+					{whereStatementValues.map((value, index) => (
+						<div key={index} className='w-full'>
+							{index % 2 === 0 ? (
+								<ColumnToWhereStatementItem
+									index={index}
+									columns={selectedWhereTableColumns}
+									whereColumnName={value.whereColumnName}
+									whereColumnSign={value.whereColumnSign}
+									whereColumnValue={value.whereColumnValue}
+									onInputChange={handleWhereInputChange}
+								/>
+							) : (
+								<div key={index} className='flex flex-col justify-start w-full mt-2'>
+									<p className='text-sm text-left'>Logical operator:</p>
+									<select
+										value={whereColumnOperatorValue[index - 1].whereOperator}
+										onChange={event => handleWhereOperatorChange(event, index - 1)}
+										className='p-1 mt-1 bg-gray-100 rounded-sm shadow-md text-sm focus:outline-mainColor w-1/3'>
+										<option value=''>Select operator</option>
+										<option value='and'>AND</option>
+										<option value='or'>OR</option>
+									</select>
+								</div>
+							)}
+						</div>
+					))}
 				</>
 			)}
-			<Button className='w-full mt-10'>Update Row</Button>
-		</form>
+			<Button className='w-full mt-5' disabled={!isOperator} onClick={handleSubmit}>
+				Update Row
+			</Button>
+		</div>
 	)
 }
 
