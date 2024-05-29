@@ -37,13 +37,7 @@ const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
 	const [tableNameError, setTableNameError] = useState<string>('')
 	const [columnsError, setColumnsError] = useState<string>('')
 	const [isModalOpen, setIsModalOpen] = useState(false)
-	const [sqlCode, setSqlCode] = useState(`CREATE TABLE Users (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    age INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);`)
+	const [sqlCode, setSqlCode] = useState(``)
 
 	const handleModalOpen = () => {
 		setIsModalOpen(true)
@@ -70,7 +64,7 @@ const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
 		}
 
 		try {
-			const response = await fetch('URL', {
+			const response = await fetch('http://localhost:8000/db/newtable', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -92,13 +86,13 @@ const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
 	}
 
 	const handleTableCreate = async () => {
-		toast.success('Pomyślnie dodano nową tabelę!', {
+		toast.success('The table was created successfully!', {
 			position: 'top-center',
 		})
 		onTableCreated()
 		
 		try {
-			const acceptResponse = await fetch('URL', {
+			const acceptResponse = await fetch('http://localhost:8000/db/newsql', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'

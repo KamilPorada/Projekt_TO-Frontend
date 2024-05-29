@@ -3,6 +3,9 @@ import React, { useState } from 'react'
 import Button from '../UI/Button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import Modal from '../UI/Modal'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 interface TableColumn {
 	fieldName: string
@@ -27,6 +30,10 @@ const InsertQueryForm: React.FC = () => {
 	const [tableName, setTableName] = useState<string>('')
 	const [selectedTableColumns, setSelectedTableColumns] = useState<TableColumn[]>([])
 	const [columnValues, setColumnValues] = useState<{ [key: string]: string }>({})
+
+	const [isModalOpen, setIsModalOpen] = useState(false)
+	const [sqlCode, setSqlCode] = useState(``)
+
 
 	const dummyTables: Table[] = [
 		{
@@ -163,6 +170,14 @@ const InsertQueryForm: React.FC = () => {
 		},
 	]
 
+	const handleModalOpen = () => {
+		setIsModalOpen(true)
+	}
+
+	const handleModalClose = () => {
+		setIsModalOpen(false)
+	}
+
 	const handleTableChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
 		const selectedTableName = event.target.value
 		const selectedTable = dummyTables.find(table => table.name === selectedTableName)
@@ -209,10 +224,9 @@ const InsertQueryForm: React.FC = () => {
 		}
 	}
 
-	const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-		event.preventDefault()
+	const handleSubmit = async () => {
 		const columnNames = Object.keys(columnValues)
-		const jsonData = {
+		const dataToSend = {
 			tableName: tableName,
 			columns: columnNames.map(columnName => {
 				const column = selectedTableColumns.find(col => col.fieldName === columnName);
@@ -227,30 +241,58 @@ const InsertQueryForm: React.FC = () => {
 				}
 			}).filter(column => column !== null)
 		};
-		console.log(jsonData)
+		console.log(dataToSend)
 
-		// try {
-		// 	const response = await fetch('URL', {
-		// 		method: 'POST',
-		// 		headers: {
-		// 			'Content-Type': 'application/json'
-		// 		},
-		// 		body: JSON.stringify(dataToSend)
-		// 	});
+		try {
+			const response = await fetch('URL', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(dataToSend)
+			});
 
-		// 	if (response.ok) {
-		// 		console.log('Data sent successfully');
-		// 	} else {
-		// 		console.error('Failed to send data');
-		// 	}
-		// } catch (error) {
-		// 	console.error('Error sending data:', error);
-		// }
+			if (response.ok) {
+				const responseData = await response.json()
+				setSqlCode(responseData.response)
+				handleModalOpen()
+			} else {
+				console.error('Failed to send data');
+			}
+		} catch (error) {
+			console.error('Error sending data:', error);
+		}
+	}
+
+	const handleExecute = async () => {
+		toast.success('The operation was executed successfully!', {
+			position: 'top-center',
+		})
+
+		try {
+			const acceptResponse = await fetch('http://localhost:8000/db/newsql', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(sqlCode),
+			})
+
+			if (acceptResponse.ok) {
+				console.log('Sql code sent successfully')
+				handleModalClose()
+			} else {
+				console.error('Failed to send sql code')
+				//obsługa w przypadku błędu tj. czerwony sql a poniżej błąd z mysql jak będzie połączenie to ddorobie
+			}
+		} catch (error) {
+			console.error('Error sending sql code:', error)
+		}
 	}
 
 	return (
-		<form
-			onSubmit={handleSubmit}
+		<>
+		<div
 			className='flex flex-col justify-center items-center w-full sm:w-4/5 md:w-3/5 lg:w-1/2 bg-white rounded-md shadow-lg p-5'>
 			<div className='flex flex-col justify-center items-center text-center'>
 				<div className='flex flex-row justify-center items-center gap-4 text-mainColor mb-2'>
@@ -288,8 +330,10 @@ const InsertQueryForm: React.FC = () => {
 						</div>
 					)
 			)}
-			<Button className='w-full mt-5'>Insert Row</Button>
-		</form>
+			<Button className='w-full mt-5' onClick={handleSubmit}>Insert Row</Button>
+		</div>
+		{isModalOpen && <Modal onAction={handleExecute} onClose={handleModalClose} code={sqlCode} />}
+		</>
 	)
 }
 

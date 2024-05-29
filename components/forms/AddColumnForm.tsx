@@ -42,6 +42,8 @@ const AddColumnForm: React.FC<Props> = ({ onAddColumn, editedColumn }) => {
 	const [newColumn, setNewColumn] = useState<TableColumn>(initialColumnState)
 	const [errors, setErrors] = useState<any>({})
 	const [isEditing, setIsEditing] = useState<boolean>(false)
+	const [tables, setTables] = useState<string[]>([])
+	const [columnNames, setColumnNames] = useState<string[]>([])
 
 	const variableTypes = [
 		'integer',
@@ -108,6 +110,30 @@ const AddColumnForm: React.FC<Props> = ({ onAddColumn, editedColumn }) => {
 		}
 	}, [editedColumn])
 
+	useEffect(() => {
+		if (newColumn.isForeignKey) {
+			fetch('http://localhost:8000/db/tablesname')
+				.then(response => response.json())
+				.then(data => setTables(data))
+				.catch(error => {
+					console.error('Error fetching table names:', error)
+				})
+		}
+	}, [newColumn.isForeignKey])
+
+	useEffect(() => {
+		if (newColumn.foreignTable) {
+			fetch(`http://localhost:8000/db/fieldsname?tablename=${newColumn.foreignTable}`)
+				.then(response => response.json())
+				.then(data => {
+					setColumnNames(data);
+				})
+				.catch(error => {
+					console.error('Error fetching column names:', error);
+				});
+		}
+	}, [newColumn.foreignTable]);
+	
 	return (
 		<div className='w-full ring-1 ring-gray-300 rounded-md shadow-lg p-2 mt-4'>
 			<p className='font-semibold text-center'>Column {newColumn.fieldName}</p>
@@ -249,21 +275,31 @@ const AddColumnForm: React.FC<Props> = ({ onAddColumn, editedColumn }) => {
 				<div className='flex flex-col justify-between items-left  gap-2'>
 					<div className='flex flex-col w-full mt-3 text-sm'>
 						<label>Table</label>
-						<input
-							type='text'
-							className='p-1 mt-1 bg-gray-100 rounded-sm shadow-md focus:outline-mainColor'
+						<select
 							value={newColumn.foreignTable}
 							onChange={e => handleChange('foreignTable', e.target.value)}
-						/>
+							className='p-1 mt-1 bg-gray-100 rounded-sm shadow-md focus:outline-mainColor'>
+							<option value=''>Select table...</option>
+							{tables.map((table, idx) => (
+								<option key={idx} value={table}>
+									{table}
+								</option>
+							))}
+						</select>
 					</div>
 					<div className='flex flex-col w-full mt-3 text-sm'>
 						<label>Column</label>
-						<input
-							type='text'
-							className='p-1 mt-1 bg-gray-100 rounded-sm shadow-md focus:outline-mainColor'
+						<select
 							value={newColumn.foreignField}
 							onChange={e => handleChange('foreignField', e.target.value)}
-						/>
+							className='p-1 mt-1 bg-gray-100 rounded-sm shadow-md focus:outline-mainColor'>
+							<option value=''>Select column...</option>
+							{columnNames.map((column, idx) => (
+								<option key={idx} value={column}>
+									{column}
+								</option>
+							))}
+						</select>
 					</div>
 					{errors.foreignKey && <span className='text-red-500 text-xs'>{errors.foreignKey}</span>}
 				</div>

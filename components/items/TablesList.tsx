@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import TableItem from './TableItem'
+import Modal from '../UI/Modal'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -27,6 +28,8 @@ const TablesList: React.FC<{
 	const [allTables, setAllTables] = useState<Table[]>([])
 	const [filteredTables, setFilteredTables] = useState<Table[]>([])
 	const [loading, setLoading] = useState(true)
+	const [isModalOpen, setIsModalOpen] = useState(false)
+	const [sqlCode, setSqlCode] = useState(``)
 
 	const dummyTables: Table[] = [
 		{
@@ -172,9 +175,17 @@ const TablesList: React.FC<{
 		},
 	]
 
+	const handleModalOpen = () => {
+		setIsModalOpen(true)
+	}
+
+	const handleModalClose = () => {
+		setIsModalOpen(false)
+	}
+
 	const fetchTables = async () => {
 		try {
-			const response = await fetch('URL')
+			const response = await fetch('http://localhost:8000/db/tables')
 			const data = await response.json()
 
 			setAllTables(data)
@@ -187,13 +198,17 @@ const TablesList: React.FC<{
 
 	const handleDelete = async (tableName: string) => {
 		try {
-			// await fetch(`URL${tableName}`, {
-			// 	method: 'DELETE',
-			// })
+			await fetch(`http://localhost:8000/db/deltable`, {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(tableName),
+			})
 
 			const filteredTables = allTables.filter(table => table.tableName !== tableName)
 
-			toast.success('Pomyślnie usunięto tabelę!', {
+			toast.success('Successfully deleted the table!', {
 				position: 'top-center',
 			})
 
@@ -230,21 +245,23 @@ const TablesList: React.FC<{
 	}
 
 	return (
-		<div className='flex flex-row justify-center items-center flex-wrap gap-16'>
-			{filteredTables.length > 0 ? (
-				filteredTables.map(table => (
-					<TableItem
-						key={table.tableName}
-						tableName={table.tableName}
-						columns={table.columns}
-						handleDelete={() => handleDelete(table.tableName)}
-						handleEdit={handleEdit}
-					/>
-				))
-			) : (
-				<p className='w-full mt-10 text-black text-center'>Brak tabel!</p>
-			)}
-		</div>
+		<>
+			<div className='flex flex-row justify-center items-center flex-wrap gap-16'>
+				{filteredTables.length > 0 ? (
+					filteredTables.map(table => (
+						<TableItem
+							key={table.tableName}
+							tableName={table.tableName}
+							columns={table.columns}
+							handleDelete={() => handleDelete(table.tableName)}
+							handleEdit={handleEdit}
+						/>
+					))
+				) : (
+					<p className='w-full mt-10 text-black text-center'>Brak tabel!</p>
+				)}
+			</div>
+		</>
 	)
 }
 

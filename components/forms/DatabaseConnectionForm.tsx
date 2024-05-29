@@ -1,52 +1,60 @@
 'use client'
-import React, { useState } from 'react';
-import Button from '../UI/Button';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDatabase } from '@fortawesome/free-solid-svg-icons';
+import React, { useState } from 'react'
+import Button from '../UI/Button'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faDatabase } from '@fortawesome/free-solid-svg-icons'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import { useRouter } from 'next/navigation'
 
 const DatabaseConnectionForm: React.FC = () => {
-    const [login, setLogin] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const [databaseName, setDatabaseName] = useState<string>('');
-    const [ipAddress, setIpAddress] = useState<string>('');
-    const [port, setPort] = useState<string>('');
-    const [errors, setErrors] = useState<{ [key: string]: boolean }>({
-        login: false,
-        password: false,
-        databaseName: false,
-        ipAddress: false,
-        port: false,
-    });
+	const [login, setLogin] = useState<string>('')
+	const [password, setPassword] = useState<string>('')
+	const [databaseName, setDatabaseName] = useState<string>('')
+	const [ipAddress, setIpAddress] = useState<string>('')
+	const [port, setPort] = useState<string>('')
+	const [errors, setErrors] = useState<{ [key: string]: boolean }>({
+		login: false,
+		password: false,
+		databaseName: false,
+		ipAddress: false,
+		port: false,
+	})
+	const router = useRouter()
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault()
 
-        const data = {
-            login,
-            password,
-            databaseName,
-            ipAddress,
-            port,
-        };
+		const data = {
+			login,
+			password,
+			databaseName,
+			ipAddress,
+			port,
+		}
 
-        // try {
-        //     const response = await fetch('/db/connect', {
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //         },
-        //         body: JSON.stringify(data),
-        //     });
+		try {
+			const response = await fetch('http://localhost:8000/db/connect', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(data),
+			})
 
-        //     if (response.ok) {
-        //         console.log('Connection successful');
-        //     } else {
-        //         console.error('Failed to connect');
-        //     }
-        // } catch (error) {
-        //     console.error('Error connecting to backend:', error);
-        // }
-    };
+			if (response.ok) {
+				console.log('Connection successful')
+				toast.success('Correctly connection to the database!', {
+					position: 'top-center',
+				})
+				router.push('/table')
+			} else {
+				console.error('Failed to connect')
+			}
+		} catch (error) {
+			console.error('Error connecting to backend:', error)
+		}
+	}
 
 	return (
 		<form

@@ -76,7 +76,7 @@ function SideBar() {
 						</div>
 						{isSubMenuVisible && (
 							<div className='flex flex-col pl-2 mt-2'>
-								<Link href={''}>
+								<Link href={'select'}>
 									<div className='flex flex-row justify-between items-center mt-2 text-white font-thin cursor-pointer transition hover:text-mainColor hover:font-normal'>
 										<p className='text-sm md:text-base'>Select query</p>
 										<FontAwesomeIcon icon={faArrowPointer} />
