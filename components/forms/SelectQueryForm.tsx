@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPenToSquare, faPlus } from '@fortawesome/free-solid-svg-icons'
 import ColumnToWhereStatementItem from '../Items/ColumnToWhereStatement'
 import Modal from '../UI/Modal'
+import SelectResultModal from '../UI/SelectResultModal'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -31,8 +32,8 @@ interface Table {
 const SelectQueryForm: React.FC = () => {
 	const [tableName, setTableName] = useState<string>('')
 	const [tables, setTables] = useState<string[]>([])
-	const [columnNames, setColumnNames] = useState<string[]>([])
-	const [selectedTableColumns, setSelectedTableColumns] = useState<TableColumn[]>([])
+	const [selectedTable, setSelectedTable] = useState<Table | undefined>()
+	const [selectedTableColumns, setSelectedTableColumns] = useState<TableColumn[] | undefined>()
 	const [selectedWhereTableColumns, setWhereSelectedTableColumns] = useState<TableColumn[]>([])
 
 	const initialColumnValues = [{ columnName: '', columnValue: '' }]
@@ -51,149 +52,6 @@ const SelectQueryForm: React.FC = () => {
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [sqlCode, setSqlCode] = useState(``)
 
-	const dummyTables: Table[] = [
-		{
-			name: 'users',
-			columns: [
-				{
-					fieldName: 'id',
-					fieldType: 'integer',
-					fieldSize1: 0,
-					fieldSize2: 0,
-					isPrimaryKey: true,
-					isForeignKey: false,
-					foreignTable: '',
-					foreignField: '',
-					isAutoincrement: true,
-					isUnique: true,
-					isNotNull: true,
-					editMode: 0,
-				},
-				{
-					fieldName: 'username',
-					fieldType: 'varchar',
-					fieldSize1: 50,
-					fieldSize2: 0,
-					isPrimaryKey: false,
-					isForeignKey: false,
-					foreignTable: '',
-					foreignField: '',
-					isAutoincrement: false,
-					isUnique: false,
-					isNotNull: true,
-					editMode: 0,
-				},
-				{
-					fieldName: 'email',
-					fieldType: 'varchar',
-					fieldSize1: 100,
-					fieldSize2: 0,
-					isPrimaryKey: false,
-					isForeignKey: false,
-					foreignTable: '',
-					foreignField: '',
-					isAutoincrement: false,
-					isUnique: true,
-					isNotNull: true,
-					editMode: 0,
-				},
-			],
-		},
-		{
-			name: 'products',
-			columns: [
-				{
-					fieldName: 'id',
-					fieldType: 'integer',
-					fieldSize1: 0,
-					fieldSize2: 0,
-					isPrimaryKey: true,
-					isForeignKey: false,
-					foreignTable: '',
-					foreignField: '',
-					isAutoincrement: true,
-					isUnique: true,
-					isNotNull: true,
-					editMode: 0,
-				},
-				{
-					fieldName: 'name',
-					fieldType: 'varchar',
-					fieldSize1: 100,
-					fieldSize2: 0,
-					isPrimaryKey: false,
-					isForeignKey: false,
-					foreignTable: '',
-					foreignField: '',
-					isAutoincrement: false,
-					isUnique: false,
-					isNotNull: true,
-					editMode: 0,
-				},
-				{
-					fieldName: 'price',
-					fieldType: 'decimal',
-					fieldSize1: 10,
-					fieldSize2: 2,
-					isPrimaryKey: false,
-					isForeignKey: false,
-					foreignTable: '',
-					foreignField: '',
-					isAutoincrement: false,
-					isUnique: false,
-					isNotNull: true,
-					editMode: 0,
-				},
-			],
-		},
-		{
-			name: 'orders',
-			columns: [
-				{
-					fieldName: 'id',
-					fieldType: 'integer',
-					fieldSize1: 0,
-					fieldSize2: 0,
-					isPrimaryKey: true,
-					isForeignKey: false,
-					foreignTable: '',
-					foreignField: '',
-					isAutoincrement: true,
-					isUnique: true,
-					isNotNull: true,
-					editMode: 0,
-				},
-				{
-					fieldName: 'product_id',
-					fieldType: 'integer',
-					fieldSize1: 0,
-					fieldSize2: 0,
-					isPrimaryKey: false,
-					isForeignKey: true,
-					foreignTable: 'products',
-					foreignField: 'id',
-					isAutoincrement: false,
-					isUnique: false,
-					isNotNull: true,
-					editMode: 0,
-				},
-				{
-					fieldName: 'quantity',
-					fieldType: 'integer',
-					fieldSize1: 0,
-					fieldSize2: 0,
-					isPrimaryKey: false,
-					isForeignKey: false,
-					foreignTable: '',
-					foreignField: '',
-					isAutoincrement: false,
-					isUnique: false,
-					isNotNull: true,
-					editMode: 0,
-				},
-			],
-		},
-	]
 
 	const handleModalOpen = () => {
 		setIsModalOpen(true)
@@ -205,18 +63,28 @@ const SelectQueryForm: React.FC = () => {
 
 	const handleTableChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
 		const selectedTableName = event.target.value
-		const selectedTable = dummyTables.find(table => table.name === selectedTableName)
 
-		if (selectedTable) {
-			const filteredColumns = selectedTable.columns.filter(
-				column => !(column.fieldType === 'integer' && column.isPrimaryKey && column.isAutoincrement)
-			)
+		fetch(`http://localhost:8000/db/fields?tablename=${selectedTableName}`)
+			.then(response => response.json())
+			.then(data => {
+				setSelectedTable(data)
+			})
+			.catch(error => {
+				console.error('Error fetching column names:', error)
+			})
 
-			setTableName(selectedTableName)
-			setSelectedTableColumns(filteredColumns)
-			setWhereSelectedTableColumns(selectedTable.columns)
-			resetFormFields()
-		}
+		console.log(selectedTableName)
+		console.log(selectedTable)
+
+		const filteredColumns = selectedTable?.columns.filter(
+			column => !(column.fieldType === 'INTEGER' && column.isPrimaryKey && column.isAutoincrement)
+		)
+
+		setTableName(selectedTableName)
+		setSelectedTableColumns(filteredColumns)
+		setWhereSelectedTableColumns(selectedTable?.columns || [])
+
+		resetFormFields()
 	}
 
 	const resetFormFields = () => {
@@ -258,7 +126,7 @@ const SelectQueryForm: React.FC = () => {
 	}
 
 	const handleAddWhereField = () => {
-		if (columnValues.length < selectedTableColumns.length + 1) {
+		if (columnValues.length < 0) {
 			setColumnValues([...columnValues, { columnName: '', columnValue: '' }])
 		}
 
@@ -367,24 +235,27 @@ const SelectQueryForm: React.FC = () => {
 	}, [isOperator])
 
 	useEffect(() => {
+		if (selectedTable) {
+			const filteredColumns = selectedTable.columns.filter(
+				column => !(column.fieldType === 'INTEGER' && column.isPrimaryKey && column.isAutoincrement)
+			);
+			setSelectedTableColumns(filteredColumns);
+			setWhereSelectedTableColumns(selectedTable.columns);
+		}
+	}, [selectedTable]);
+	
+
+	useEffect(() => {
 		fetch('http://localhost:8000/db/tablesname')
 			.then(response => response.json())
-			.then(data => setTables(data))
+			.then(data => {
+				setTables(data)
+			})
 			.catch(error => {
 				console.error('Error fetching table names:', error)
 			})
 	}, [])
 
-	useEffect(() => {
-		fetch(`http://localhost:8000/db/fieldsname?tablename=${tableName}`)
-			.then(response => response.json())
-			.then(data => {
-				setColumnNames(data)
-			})
-			.catch(error => {
-				console.error('Error fetching column names:', error)
-			})
-	}, [tables])
 
 	return (
 		<>
@@ -400,16 +271,16 @@ const SelectQueryForm: React.FC = () => {
 				<div className='flex flex-col w-full mt-3 text-sm'>
 					<label>Select Table:</label>
 					<select
-							value={tableName}
-							onChange={handleTableChange}
-							className='p-1 mt-1 bg-gray-100 rounded-sm shadow-md focus:outline-mainColor'>
-							<option value=''>Select table...</option>
-							{tables.map((table, idx) => (
-								<option key={idx} value={table}>
-									{table}
-								</option>
-							))}
-						</select>
+						value={tableName}
+						onChange={handleTableChange}
+						className='p-1 mt-1 bg-gray-100 rounded-sm shadow-md focus:outline-mainColor'>
+						<option value=''>table</option>
+						{tables.map(table => (
+							<option key={table} value={table}>
+								{table}
+							</option>
+						))}
+					</select>
 				</div>
 				{tableName && (
 					<>
@@ -427,7 +298,7 @@ const SelectQueryForm: React.FC = () => {
 								/>
 								ALL (*)
 							</label>
-							{selectedTableColumns.map((column, index) => (
+							{selectedTableColumns?.map((column, index) => (
 								<label key={index} className='flex items-center'>
 									<input
 										type='checkbox'
@@ -446,7 +317,7 @@ const SelectQueryForm: React.FC = () => {
 								<p className='text-sm'>Columns for where statement:</p>
 								<Button
 									className='flex justify-center items-center px-3 mx-0'
-									disabled={columnValues.length == selectedTableColumns.length + 1}
+									// disabled={columnValues.length == selectedTableColumns.length + 1}
 									onClick={handleAddWhereField}>
 									<FontAwesomeIcon className='text-xs' icon={faPlus} />
 								</Button>
@@ -531,6 +402,7 @@ const SelectQueryForm: React.FC = () => {
 				</Button>
 			</div>
 			{isModalOpen && <Modal onAction={handleExecute} onClose={handleModalClose} code={sqlCode} />}
+			{/* <SelectResultModal onClose={handleModalClose} data={dummyData} /> */}
 		</>
 	)
 }
