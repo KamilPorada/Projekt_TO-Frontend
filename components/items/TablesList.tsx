@@ -35,6 +35,7 @@ const TablesList: React.FC<{
 			const data = await response.json()
 
 			setAllTables(data)
+			setFilteredTables(data)
 		} catch (error) {
 			console.log(error)
 		} finally {
