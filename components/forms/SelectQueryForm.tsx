@@ -45,13 +45,13 @@ const SelectQueryForm: React.FC = () => {
 	const [isOperator, setIsOperator] = useState<boolean>(true)
 	const [selectedColumns, setSelectedColumns] = useState<string[]>([])
 
-	const [limit, setLimit] = useState<string | number>('')
+	const [limit, setLimit] = useState<string | number>(100)
 
 	const [orderBy, setOrderBy] = useState<string>('none')
+	const [orderByColumn, setOrderByColumn] = useState<string>('')
 
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [sqlCode, setSqlCode] = useState(``)
-
 
 	const handleModalOpen = () => {
 		setIsModalOpen(true)
@@ -94,6 +94,7 @@ const SelectQueryForm: React.FC = () => {
 		setWhereColumnOperatorValue([{ whereOperator: '' }])
 		setIsOperator(true)
 		setLimit('')
+		setOrderByColumn('')
 		setOrderBy('none')
 	}
 
@@ -157,6 +158,10 @@ const SelectQueryForm: React.FC = () => {
 		setOrderBy(event.target.value)
 	}
 
+	const handleOrderByChangeColumn = (event: React.ChangeEvent<HTMLSelectElement>) => {
+		setOrderByColumn(event.target.value)
+	}
+
 	const handleSubmit = async () => {
 		const cleanWhereStatementValues = whereStatementValues.filter(value => {
 			return value.whereColumnName !== '' || value.whereColumnSign !== '' || value.whereColumnValue !== ''
@@ -173,6 +178,7 @@ const SelectQueryForm: React.FC = () => {
 			whereColumnOperatorValue: cleanWhereColumnOperatorValue,
 			limit: limit === '' ? 'none' : limit,
 			orderBy: orderBy,
+			orderByColumn: orderByColumn,
 		}
 
 		console.log('Data to send:', dataToSend)
@@ -238,12 +244,11 @@ const SelectQueryForm: React.FC = () => {
 		if (selectedTable) {
 			const filteredColumns = selectedTable.columns.filter(
 				column => !(column.fieldType === 'INTEGER' && column.isPrimaryKey && column.isAutoincrement)
-			);
-			setSelectedTableColumns(filteredColumns);
-			setWhereSelectedTableColumns(selectedTable.columns);
+			)
+			setSelectedTableColumns(filteredColumns)
+			setWhereSelectedTableColumns(selectedTable.columns)
 		}
-	}, [selectedTable]);
-	
+	}, [selectedTable])
 
 	useEffect(() => {
 		fetch('http://localhost:8000/db/tablesname')
@@ -255,7 +260,6 @@ const SelectQueryForm: React.FC = () => {
 				console.error('Error fetching table names:', error)
 			})
 	}, [])
-
 
 	return (
 		<>
@@ -315,10 +319,7 @@ const SelectQueryForm: React.FC = () => {
 						<div className='flex flex-col w-full my-2 text-sm'>
 							<div className='flex flex-row justify-between items-center w-full my-2'>
 								<p className='text-sm'>Columns for where statement:</p>
-								<Button
-									className='flex justify-center items-center px-3 mx-0'
-									// disabled={columnValues.length == selectedTableColumns.length + 1}
-									onClick={handleAddWhereField}>
+								<Button className='flex justify-center items-center px-3 mx-0' onClick={handleAddWhereField}>
 									<FontAwesomeIcon className='text-xs' icon={faPlus} />
 								</Button>
 							</div>
@@ -360,7 +361,20 @@ const SelectQueryForm: React.FC = () => {
 							/>
 						</div>
 						<div className='flex flex-col w-full my-2 text-sm'>
-							<label>Order By:</label>
+							<div className='flex flex-row items-center gap-3 w-full'>
+								<label className='w-20'>Order By:</label>
+								<select
+									value={orderByColumn}
+									onChange={handleOrderByChangeColumn}
+									className='p-1 mt-1 bg-gray-100 rounded-sm shadow-md text-sm w-full focus:outline-mainColor'>
+									<option value='none'>None</option>
+									{selectedTableColumns?.map((column, index) => (
+										<option key={index} value={column.fieldName}>
+											{column.fieldName}
+										</option>
+									))}
+								</select>
+							</div>
 							<label className='flex items-center'>
 								<input
 									type='radio'

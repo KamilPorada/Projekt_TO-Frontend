@@ -28,17 +28,7 @@ const TablesList: React.FC<{
 	const [allTables, setAllTables] = useState<Table[]>([])
 	const [filteredTables, setFilteredTables] = useState<Table[]>([])
 	const [loading, setLoading] = useState(true)
-	const [isModalOpen, setIsModalOpen] = useState(false)
-	const [sqlCode, setSqlCode] = useState(``)
-
-	const handleModalOpen = () => {
-		setIsModalOpen(true)
-	}
-
-	const handleModalClose = () => {
-		setIsModalOpen(false)
-	}
-
+	
 	const fetchTables = async () => {
 		try {
 			const response = await fetch('http://localhost:8000/db/tables')

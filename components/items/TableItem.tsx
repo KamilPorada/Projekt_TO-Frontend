@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import ColumnFieldItem from './ColumnFieldItem'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTable, faPenToSquare, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faTable, faPenToSquare, faTrash, faCode } from '@fortawesome/free-solid-svg-icons'
 import Button from '../UI/Button'
 
 const TableItem: React.FC<{
@@ -75,14 +75,18 @@ const TableItem: React.FC<{
 			{showModal && (
 				<div className='fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-50'>
 					<div className='bg-white p-4 rounded w-3/4 sm:w-auto'>
-						<p className='text-black font-semibold'>Czy na pewno chcesz usunąć tę tabelę?</p>
+						<p className='text-black font-semibold'>Are you sure you want to delete this table?</p>
+						<div className='flex flex-row justify-center items-center gap-3'>
+							<h3 className='font-bold text-lg lg:text-2xl'>SQL Query</h3>
+							<FontAwesomeIcon icon={faCode} className='text-2xl lg:text-3xl text-mainColor' />
+						</div>
+						<p
+							className='text-sm lg:text-base italic font-thin whitespace-pre-line'
+							dangerouslySetInnerHTML={{ __html: `DROP TABLE IF EXISTS ${props.tableName};` }}
+						/>
 						<div className='flex justify-end mt-4'>
-							<Button className='' onClick={handleConfirmDelete}>
-								Tak
-							</Button>
-							<Button className='' onClick={handleCancelDelete}>
-								Nie
-							</Button>
+							<Button onClick={handleCancelDelete}>Cancel</Button>
+							<Button onClick={handleConfirmDelete}>Execute</Button>
 						</div>
 					</div>
 				</div>
