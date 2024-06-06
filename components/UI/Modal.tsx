@@ -8,9 +8,10 @@ interface ModalProps {
 	onClose: () => void
 	onAction: () => void
 	code: string
+	error: string
 }
 
-const Modal: React.FC<ModalProps> = ({ onClose, onAction, code }) => {
+const Modal: React.FC<ModalProps> = ({ onClose, onAction, code, error }) => {
 	return (
 		<div className='fixed inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50 z-40 p-5'>
 			<div className='flex flex-col justify-center items-center gap-5 bg-white w-full sm:w-1/2 lg:w-1/3 rounded-lg p-10'>
@@ -22,6 +23,8 @@ const Modal: React.FC<ModalProps> = ({ onClose, onAction, code }) => {
 					className='text-sm lg:text-base italic font-thin whitespace-pre-line'
 					dangerouslySetInnerHTML={{ __html: code }}
 				/>
+
+				<p className='text-sm lg:text-base font-bold text-red-500'>{error}</p>
 
 				<div className='flex flex-row justify-center items-center gap-4'>
 					<Button onClick={onClose}>Cancel</Button>

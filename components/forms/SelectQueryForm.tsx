@@ -51,7 +51,25 @@ const SelectQueryForm: React.FC = () => {
 	const [orderByColumn, setOrderByColumn] = useState<string>('')
 
 	const [isModalOpen, setIsModalOpen] = useState(false)
+	const [isSelectResultModalOpen, setIsSelectResultModalOpen] = useState(false)
 	const [sqlCode, setSqlCode] = useState(``)
+	const [sqlError, setSqlError] = useState('')
+
+	const [selectResults, setSelectResults] = useState({
+		status: true,
+		rows: [
+			{ id: 1, title: 'Alice', age: 25, country: 'USA', occupation: 'Engineer', salary: 70000 },
+			{ id: 2, title: 'Bob', age: 30, country: 'Canada', occupation: 'Designer', salary: 65000 },
+			{ id: 3, title: 'Charlie', age: 28, country: 'UK', occupation: 'Developer', salary: 72000 },
+			{ id: 4, title: 'David', age: 35, country: 'Australia', occupation: 'Manager', salary: 90000 },
+			{ id: 5, title: 'Eve', age: 22, country: 'Germany', occupation: 'Intern', salary: 30000 },
+			{ id: 6, title: 'Frank', age: 45, country: 'France', occupation: 'Director', salary: 120000 },
+			{ id: 7, title: 'Grace', age: 29, country: 'Italy', occupation: 'Analyst', salary: 67000 },
+			{ id: 8, title: 'Hannah', age: 31, country: 'Spain', occupation: 'Consultant', salary: 75000 },
+			{ id: 9, title: 'Ivan', age: 26, country: 'Russia', occupation: 'Technician', salary: 55000 },
+			{ id: 10, title: 'Judy', age: 33, country: 'Japan', occupation: 'Scientist', salary: 80000 },
+		],
+	})
 
 	const handleModalOpen = () => {
 		setIsModalOpen(true)
@@ -59,6 +77,14 @@ const SelectQueryForm: React.FC = () => {
 
 	const handleModalClose = () => {
 		setIsModalOpen(false)
+	}
+
+	const handleSelectResultModalOpen = () => {
+		setIsSelectResultModalOpen(true)
+	}
+
+	const handleSelectResultModalClose = () => {
+		setIsSelectResultModalOpen(false)
 	}
 
 	const handleTableChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -218,14 +244,25 @@ const SelectQueryForm: React.FC = () => {
 			})
 
 			if (acceptResponse.ok) {
-				console.log('Sql code sent successfully')
-				handleModalClose()
+				const responseData = await acceptResponse.json()
+				console.log('SQL code sent successfully', responseData)
+
+				setSelectResults({
+					status: responseData.status,
+					rows: responseData.rows,
+				})
+
+				if (responseData.status === false) {
+					setSqlError(responseData.rows.statusText)
+				} else {
+					handleModalClose()
+					handleSelectResultModalOpen()
+				}
 			} else {
-				console.error('Failed to send sql code')
-				//obsługa w przypadku błędu tj. czerwony sql a poniżej błąd z mysql jak będzie połączenie to ddorobie
+				console.error('Failed to send SQL code', acceptResponse.statusText)
 			}
 		} catch (error) {
-			console.error('Error sending sql code:', error)
+			console.error('Error sending SQL code:', error)
 		}
 	}
 
@@ -415,8 +452,10 @@ const SelectQueryForm: React.FC = () => {
 					Select Rows
 				</Button>
 			</div>
-			{isModalOpen && <Modal onAction={handleExecute} onClose={handleModalClose} code={sqlCode} />}
-			{/* <SelectResultModal onClose={handleModalClose} data={dummyData} /> */}
+			{isModalOpen && <Modal onAction={handleExecute} onClose={handleModalClose} code={sqlCode} error={sqlError} />}
+			{isSelectResultModalOpen && (
+				<SelectResultModal onClose={handleSelectResultModalClose} data={selectResults.rows} />
+			)}
 		</>
 	)
 }
