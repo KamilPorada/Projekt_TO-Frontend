@@ -73,6 +73,7 @@ const SelectQueryForm: React.FC = () => {
 
 	const handleModalOpen = () => {
 		setIsModalOpen(true)
+		setSqlError('')
 	}
 
 	const handleModalClose = () => {
@@ -99,8 +100,6 @@ const SelectQueryForm: React.FC = () => {
 				console.error('Error fetching column names:', error)
 			})
 
-		console.log(selectedTableName)
-		console.log(selectedTable)
 
 		const filteredColumns = selectedTable?.columns.filter(
 			column => !(column.fieldType === 'INTEGER' && column.isPrimaryKey && column.isAutoincrement)
@@ -253,7 +252,7 @@ const SelectQueryForm: React.FC = () => {
 				})
 
 				if (responseData.status === false) {
-					setSqlError(responseData.rows.statusText)
+					setSqlError(responseData.rows[0].statusText)
 				} else {
 					handleModalClose()
 					handleSelectResultModalOpen()

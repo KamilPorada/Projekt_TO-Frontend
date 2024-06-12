@@ -28,13 +28,15 @@ const TablesList: React.FC<{
 	const [allTables, setAllTables] = useState<Table[]>([])
 	const [filteredTables, setFilteredTables] = useState<Table[]>([])
 	const [loading, setLoading] = useState(true)
-	
+	const [sqlError, setSqlError] = useState('')
+
 	const fetchTables = async () => {
 		try {
 			const response = await fetch('http://localhost:8000/db/tables')
 			const data = await response.json()
 
 			setAllTables(data)
+			setFilteredTables(data)
 		} catch (error) {
 			console.log(error)
 		} finally {
@@ -44,25 +46,32 @@ const TablesList: React.FC<{
 
 	const handleDelete = async (tableName: string) => {
 		try {
-			await fetch(`http://localhost:8000/db/deltable`, {
+			const response = await fetch(`http://localhost:8000/db/deltable`, {
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify(tableName),
+				body: JSON.stringify({ tableName }),
 			})
 
-			const filteredTables = allTables.filter(table => table.tableName !== tableName)
+			const result = await response.json()
 
-			toast.success('Successfully deleted the table!', {
-				position: 'top-center',
-			})
+			if (result.status === false) {
+				setSqlError(result.rows[0].statusText)
+			} else {
+				setSqlError('')
+				const filteredTables = allTables.filter(table => table.tableName !== tableName)
 
-			setAllTables(filteredTables)
-			setFilteredTables(filteredTables)
-			setLoading(false)
+				toast.success('Successfully deleted the table!', {
+					position: 'top-center',
+				})
+
+				setAllTables(filteredTables)
+				setFilteredTables(filteredTables)
+				setLoading(false)
+			}
 		} catch (error) {
-			console.log(error)
+			console.log('Error:', error)
 		}
 	}
 
@@ -99,6 +108,7 @@ const TablesList: React.FC<{
 							columns={table.columns}
 							handleDelete={() => handleDelete(table.tableName)}
 							handleEdit={handleEdit}
+							sqlError={sqlError}
 						/>
 					))
 				) : (

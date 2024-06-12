@@ -7,6 +7,8 @@ import ColumnToWhereStatementItem from '../Items/ColumnToWhereStatement'
 import Modal from '../UI/Modal'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { useRouter } from 'next/navigation'
+
 
 interface TableColumn {
 	fieldName: string
@@ -42,9 +44,14 @@ const DeleteQueryForm: React.FC = () => {
 
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [sqlCode, setSqlCode] = useState(``)
+	const [sqlError, setSqlError] = useState('')
+
+	const router = useRouter()
+
 
 	const handleModalOpen = () => {
 		setIsModalOpen(true)
+		setSqlError('')
 	}
 
 	const handleModalClose = () => {
@@ -64,7 +71,7 @@ const DeleteQueryForm: React.FC = () => {
 			.catch(error => {
 				console.error('Error fetching column names:', error)
 			})
-			resetFormFields()
+		resetFormFields()
 	}
 
 	const resetFormFields = () => {
@@ -118,8 +125,6 @@ const DeleteQueryForm: React.FC = () => {
 			whereColumnOperatorValue: cleanWhereColumnOperatorValue,
 		}
 
-		console.log(dataToSend)
-
 		try {
 			const response = await fetch('YOUR_API_ENDPOINT', {
 				method: 'POST',
@@ -156,11 +161,14 @@ const DeleteQueryForm: React.FC = () => {
 			})
 
 			if (acceptResponse.ok) {
-				console.log('Sql code sent successfully')
-				handleModalClose()
-			} else {
-				console.error('Failed to send sql code')
-				//obsługa w przypadku błędu tj. czerwony sql a poniżej błąd z mysql jak będzie połączenie to ddorobie
+				const responseData = await acceptResponse.json()
+
+				if (responseData.status === false) {
+					setSqlError(responseData.rows[0].statusText)
+				} else {
+					handleModalClose()
+					router.push('/select')
+				}
 			}
 		} catch (error) {
 			console.error('Error sending sql code:', error)
@@ -256,7 +264,7 @@ const DeleteQueryForm: React.FC = () => {
 					Delete Row
 				</Button>
 			</div>
-			{isModalOpen && <Modal onAction={handleExecute} onClose={handleModalClose} code={sqlCode} />}
+			{isModalOpen && <Modal onAction={handleExecute} onClose={handleModalClose} code={sqlCode} error={sqlError} />}
 		</>
 	)
 }

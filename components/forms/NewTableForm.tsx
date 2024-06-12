@@ -204,7 +204,7 @@ const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
 					Create New Table
 				</Button>
 			</div>
-			{isModalOpen && <Modal onAction={handleTableCreate} onClose={handleModalClose} code={sqlCode} />}
+			{isModalOpen && <Modal onAction={handleTableCreate} onClose={handleModalClose} code={sqlCode} error=''/>}
 		</>
 	)
 }

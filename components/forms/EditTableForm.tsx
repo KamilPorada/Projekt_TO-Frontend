@@ -231,7 +231,7 @@ const EditTableForm: React.FC<EditTableFormProps> = ({ editedTable, onTableEdite
 					Edit Table
 				</Button>
 			</div>
-			{isModalOpen && <Modal onAction={handleExecute} onClose={handleModalClose} code={sqlCode} />}
+			{isModalOpen && <Modal onAction={handleExecute} onClose={handleModalClose} code={sqlCode} error='' />}
 		</>
 	)
 }
