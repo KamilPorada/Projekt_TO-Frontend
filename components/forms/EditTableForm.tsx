@@ -57,12 +57,14 @@ const EditTableForm: React.FC<EditTableFormProps> = ({ editedTable, onTableEdite
 	const [columnsError, setColumnsError] = useState<string>('')
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [sqlCode, setSqlCode] = useState(``)
+	const [sqlError, setSqlError] = useState(``)
 
 	const handleModalOpen = () => {
 		setIsModalOpen(true)
 	}
 
 	const handleModalClose = () => {
+		setSqlError('')
 		setIsModalOpen(false)
 	}
 
@@ -119,10 +121,14 @@ const EditTableForm: React.FC<EditTableFormProps> = ({ editedTable, onTableEdite
 				},
 				body: JSON.stringify(sqlCode),
 			})
-
+			
 			if (acceptResponse.ok) {
-				console.log('Sql code sent successfully')
-				handleModalClose()
+				const responseData = await acceptResponse.json()
+				if (responseData.status === false) {
+					setSqlError(responseData.rows[0].statusText)
+				} else {
+					handleModalClose()
+				}
 			} else {
 				console.error('Failed to send sql code')
 				//obsługa w przypadku błędu tj. czerwony sql a poniżej błąd z mysql jak będzie połączenie to ddorobie
@@ -145,7 +151,7 @@ const EditTableForm: React.FC<EditTableFormProps> = ({ editedTable, onTableEdite
 				})
 				return updatedColumns
 			})
-			newColumn.editMode = 2 //edytowana kolumna podczas edycji tabeli
+			if(newColumn.editMode!=1)newColumn.editMode = 2 //edytowana kolumna podczas edycji tabeli
 		} else {
 			setColumns(prevColumns => [...prevColumns, newColumn])
 			newColumn.editMode = 1 //nowa kolumna podczas edycji abeli
@@ -231,7 +237,7 @@ const EditTableForm: React.FC<EditTableFormProps> = ({ editedTable, onTableEdite
 					Edit Table
 				</Button>
 			</div>
-			{isModalOpen && <Modal onAction={handleExecute} onClose={handleModalClose} code={sqlCode} error='' />}
+			{isModalOpen && <Modal onAction={handleExecute} onClose={handleModalClose} code={sqlCode} error={sqlError} />}
 		</>
 	)
 }

@@ -208,7 +208,7 @@ const SelectQueryForm: React.FC = () => {
 
 		console.log('Data to send:', dataToSend)
 		try {
-			const response = await fetch('/api/select', {
+			const response = await fetch('http://localhost:8000/db/select', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

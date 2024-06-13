@@ -98,8 +98,8 @@ const ColumnToWhereStatementItem: React.FC<ColumnToWhereStatementItemProps> = ({
 					onChange={handleWhereColumnSignChange}
 					className='p-1 mt-1 bg-gray-100 rounded-sm shadow-md focus:outline-mainColor'>
 					<option value=''>Select Sign</option>
-					<option value='=='>{'=='}</option>
-					<option value='!='>{'!='}</option>
+					<option value='=='>{'='}</option>
+					<option value='!='>{'<>'}</option>
 					<option value='>'>{'>'}</option>
 					<option value='>='>{'>='}</option>
 					<option value='<'>{'<'}</option>

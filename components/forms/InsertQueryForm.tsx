@@ -129,7 +129,7 @@ const InsertQueryForm: React.FC = () => {
 		}
 
 		try {
-			const response = await fetch('URL', {
+			const response = await fetch('http://localhost:8000/db/insert', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

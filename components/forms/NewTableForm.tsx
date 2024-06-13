@@ -74,7 +74,7 @@ const NewTableForm: React.FC<Props> = ({ onTableCreated }) => {
 		
 			if (response.ok) {
 				const responseData = await response.json();
-				setSqlCode(responseData)
+				setSqlCode(responseData.response)
 				handleModalOpen()
 				console.log('Data sent successfully:', responseData);
 			} else {

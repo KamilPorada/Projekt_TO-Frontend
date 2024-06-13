@@ -126,7 +126,7 @@ const DeleteQueryForm: React.FC = () => {
 		}
 
 		try {
-			const response = await fetch('YOUR_API_ENDPOINT', {
+			const response = await fetch('http://localhost:8000/db/delrows', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
