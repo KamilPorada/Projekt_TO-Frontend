@@ -22,7 +22,6 @@ const TableItem: React.FC<{
 	}[]
 	handleDelete: () => Promise<void>
 	handleEdit: (tableName: string) => void
-	sqlError: string
 }> = props => {
 	const [showModal, setShowModal] = useState(false)
 
@@ -32,7 +31,7 @@ const TableItem: React.FC<{
 
 	const handleConfirmDelete = async () => {
 		await props.handleDelete()
-		if (props.sqlError.length === 0) setShowModal(false)
+		setShowModal(false)
 	}
 
 	const handleCancelDelete = () => {
@@ -84,7 +83,6 @@ const TableItem: React.FC<{
 							className='text-sm lg:text-base italic font-thin whitespace-pre-line my-3 text-center'
 							dangerouslySetInnerHTML={{ __html: `DROP TABLE IF EXISTS ${props.tableName};` }}
 						/>
-						<p className='text-sm lg:text-base font-bold text-red-500'>{props.sqlError}</p>
 						<div className='flex justify-center mt-4'>
 							<Button onClick={handleCancelDelete}>Cancel</Button>
 							<Button onClick={handleConfirmDelete}>Execute</Button>

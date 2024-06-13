@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import TableItem from './TableItem'
-import Modal from '../UI/Modal'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -28,7 +27,6 @@ const TablesList: React.FC<{
 	const [allTables, setAllTables] = useState<Table[]>([])
 	const [filteredTables, setFilteredTables] = useState<Table[]>([])
 	const [loading, setLoading] = useState(true)
-	const [sqlError, setSqlError] = useState('')
 
 	const fetchTables = async () => {
 		try {
@@ -46,7 +44,7 @@ const TablesList: React.FC<{
 
 	const handleDelete = async (tableName: string) => {
 		try {
-			const response = await fetch(`http://localhost:8000/db/deltable`, {
+			const acceptResponse = await fetch(`http://localhost:8000/db/deltable`, {
 				method: 'DELETE',
 				headers: {
 					'Content-Type': 'application/json',
@@ -54,21 +52,24 @@ const TablesList: React.FC<{
 				body: JSON.stringify({ tableName }),
 			})
 
-			const result = await response.json()
+			const result = await acceptResponse.json()
 
-			if (result.status === false) {
-				setSqlError(result.rows[0].statusText)
-			} else {
-				setSqlError('')
-				const filteredTables = allTables.filter(table => table.tableName !== tableName)
+			if (acceptResponse.ok) {
+				if (result.status === false) {
+					toast.error(result.rows[0].statusText, {
+						position: 'top-center',
+					})
+				} else {
+					const filteredTables = allTables.filter(table => table.tableName !== tableName)
 
-				toast.success('Successfully deleted the table!', {
-					position: 'top-center',
-				})
+					toast.success('Successfully deleted the table!', {
+						position: 'top-center',
+					})
 
-				setAllTables(filteredTables)
-				setFilteredTables(filteredTables)
-				setLoading(false)
+					setAllTables(filteredTables)
+					setFilteredTables(filteredTables)
+					setLoading(false)
+				}
 			}
 		} catch (error) {
 			console.log('Error:', error)
@@ -108,7 +109,6 @@ const TablesList: React.FC<{
 							columns={table.columns}
 							handleDelete={() => handleDelete(table.tableName)}
 							handleEdit={handleEdit}
-							sqlError={sqlError}
 						/>
 					))
 				) : (
